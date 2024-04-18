@@ -2,7 +2,7 @@ const environment = "Local";
 //const environment = "Production";
 
 const LOCAL_AWS_APIURL = 'http://44.212.45.234:4000';
-const LOCAL_WINDOWS_APIURL =  'http://localhost:4000';
+const LOCAL_WINDOWS_APIURL =  'http://localhost:3000';
 
 
 
@@ -63,7 +63,7 @@ async function userLogin(e) {
 
 
 
-//TODO - add new user
+//todo - add new user in flash chat app
 async function addNewUser(uObj) {
 
   console.log(`user-object : ${uObj}`);
@@ -79,7 +79,11 @@ async function addNewUser(uObj) {
     if (response.status === 201) {
       document.querySelector("#successAlert").innerText = `${response.data.userAddedResponse}`;
       successAlertAwakeSleep();
-      location.reload();
+      
+      setTimeout(function() {
+        window.location.href = '/';
+      }, 3000);
+      
     } else {
       throw new Error("Error creating user");
     }
@@ -100,6 +104,7 @@ function userRegistration(e) {
 
   const name = e.target.sn_name.value;
   const email = e.target.sn_email.value;
+  const phone = e.target.sn_phone.value;
   const password = e.target.sn_password.value;
 
   if (!name) {
@@ -108,6 +113,9 @@ function userRegistration(e) {
   } else if (!email) {
     document.querySelector("#errorAlert").innerText = 'Please fill email field.';
     return alertAwakeSleep();
+  } else if (!phone) {
+    document.querySelector("#errorAlert").innerText = 'Please fill phone field.';
+    return alertAwakeSleep();
   } else if (!password) {
     document.querySelector("#errorAlert").innerText = 'Please fill password field.';
     return alertAwakeSleep();
@@ -115,10 +123,12 @@ function userRegistration(e) {
 
   console.log("name : ", name);
   console.log("email : ", email);
+  console.log('phone : ', phone);
 
   const userObject = {
     name: name,
     email: email,
+    phone: phone,
     password: password,
   };
 
@@ -171,11 +181,11 @@ function alertAwakeSleep() {
 
 
 
-function  successAlertAwakeSleep() {
+function successAlertAwakeSleep() {
   document.querySelector("#successAlert").classList.toggle("hidden");
   setTimeout(function () {
     document.getElementById("successAlert").classList.toggle("hidden");
-  }, 2000);
+  }, 5000);
 }
 
 
