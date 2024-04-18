@@ -1,0 +1,17 @@
+{
+  "name": "flashchat",
+  "version": "1.0.0",
+  "description": "Introducing Flash Chats: your all-in-one solution for seamless one-on-one and group communication, featuring messaging, image sharing, emojis, file transfers, and customizable groups. Join the conversation today!",
+  "main": "flashchat_runner.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon flashchat_runner.js",
+    "start-server": "node flashchat_runner.js"
+  },
+  "author": "Rahul Rajkumar gupta",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.19.2"
+  }
+}
