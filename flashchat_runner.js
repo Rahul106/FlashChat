@@ -2,7 +2,6 @@ const express = require("express");
 const app = express();
 const path = require("path");
 const fs = require("fs");
-const cors = require("cors");
 const bodyParser = require("body-parser");
 const sequelize = require("./utils/database");
 
@@ -27,7 +26,6 @@ const userRoute = require("./routes/user");
 
 //middlewares
 require('dotenv').config();
-app.use(cors());
 app.use(express.json());
 app.use(express.static(publicPath));
 
@@ -42,6 +40,9 @@ app.get('/reset-password', (req, res) => {
   res.sendFile('forgotpassword.html', {root:'views'});
 });
 
+app.get('/home', (req, res) => {
+  res.sendFile('home.html', {root:'views'});
+});
 
 
 

@@ -7,12 +7,12 @@ const { Sequelize } = require('sequelize');
 
 
 
-//Login Controller
+//* - signin(authenticatation) Controller
 exports.authenticateUser = async(req, res, next) => {
 
-  try {
+  const { email, password } = req.body;
 
-    const { email, password } = req.body;
+  try {
 
     if(isNotValidInput(email)) {
         return res.status(400).json({ message: 'email is not present. kindly fill the email' , success: false });
@@ -28,20 +28,13 @@ exports.authenticateUser = async(req, res, next) => {
       
       bcrypt.compare(password, user.password, (hasherr, hashresponse) => {
 
-        if(hasherr){
+        if(hasherr) {
           throw new Error("Something went wrong in authentication");
         }
        
         if(hashresponse) {
-
           const token = generateAccessToken(user.id, user.name);
-
-          // req.session.timer = setTimeout(() => {
-          //   console.log('User automatically logged out after inactivity.');
-          // }, 1 * 60 * 1000);
-
-          return res.status(200).json({message: 'User logged in successfully', success: true, token : token, data: user})
-          
+          return res.status(200).json({message: 'User logged in successfully', success: true, token : token, data: user});
         } else {
           res.status(401).json({ message: 'User not authorized. Password Incorrect.' , success: false });
         }
@@ -53,7 +46,7 @@ exports.authenticateUser = async(req, res, next) => {
     }
     
   } catch (error) {
-    
+
     return res.status(500).json({ message:error });
   
   }
@@ -67,12 +60,11 @@ exports.authenticateUser = async(req, res, next) => {
 exports.createNewUser = async(req, res) => {
     
   try {
-    console.log('------------------');
+    
     const { name, email, phone, password } = req.body;
     console.log("Name:", name);
     console.log("Email:", email);
     console.log("Phone:", phone);
-    console.log("Password:", password);
 
     if(isNotValidInput(name)) {
       return res.status(400).json({ message: 'name is not present. kindly fill the name' });
@@ -116,7 +108,7 @@ exports.createNewUser = async(req, res) => {
 
 
 
-//function generateAccessToken ...has(payload,secretkey) encrypt payload using secret key
+//* - methods generates JWT with id and name
 const generateAccessToken = (id, name) => {
 
   return jwt.sign({id:id, name:name}, process.env.JWT_SECRET_KEY);

@@ -1,9 +1,9 @@
 const environment = "Local";
 //const environment = "Production";
 
+
 const LOCAL_AWS_APIURL = 'http://44.212.45.234:4000';
 const LOCAL_WINDOWS_APIURL =  'http://localhost:3000';
-
 
 
 let signIn = document.getElementById("i_signInForm");
@@ -12,23 +12,68 @@ let signUp = document.getElementById('si_userForm');
 
 
 
+//TODO - userLogin
+async function userLogin(e) {
+  
+  const email = e.target.n_email.value;
+  const password = e.target.n_password.value;
+  
+  try {
+  
+    if(!email.trim()) {
+      document.querySelector("#errorAlert").innerText = `Kindly fill email field.!!!`;
+      return alertAwakeSleep();
+    }
+  
+    if(!password.trim()) {
+      document.querySelector("#errorAlert").innerText = `Kindly fill password field.!!!`;
+      return alertAwakeSleep();
+    }
+  
+    const loginObj = { email, password };
+   
+    let apiURL = `${getAPIURL()}/user/login`;
+    console.log(`URL : ${apiURL}`);
+  
+    const response = await axios.post(apiURL, loginObj);
+
+    if (response.status === 200) {
+
+      localStorage.setItem('token', response.data.token)
+      alert(response.data.message);
+      window.location.href = "/home";
+      e.target.n_email.value = '';
+      e.target.n_password.value = '';
+    
+    } else {
+      throw new Error("Error in credentials");
+    }
+  
+  } catch (err) {
+    document.querySelector("#errorAlert").innerText = `${err.response.data.message}`;
+    alertAwakeSleep();
+    throw new Error(err);
+  }
+
+}
+
+
 
 
 //TODO - userLogin
 async function userLogin(e) {
+
+  const email = e.target.n_email.value;
+  const password = e.target.n_password.value;
   
   try {
-  
-    const email = e.target.n_email.value;
-    const password = e.target.n_password.value;
-  
+    
     if(!email.trim()) {
       document.querySelector("#errorAlert").innerText = `Kindly fill email field.!!!`;
       return alertAwakeSleep();;
     }
   
     if(!password.trim()) {
-   
       document.querySelector("#errorAlert").innerText = `Kindly fill password field.!!!`;
       return alertAwakeSleep();
     }
@@ -40,13 +85,11 @@ async function userLogin(e) {
   
     const response = await axios.post(apiURL, loginObj);
     if (response.status === 200) {
-  
       localStorage.setItem('token', response.data.token)
       alert(response.data.message);
       window.location.href = "/home";
       e.target.n_email.value = '';
       e.target.n_password.value = '';
-      
     } else {
       throw new Error("Error in credentials");
     }
@@ -191,6 +234,7 @@ function successAlertAwakeSleep() {
 
 
 
+//todo - add eventlistener on signin butoon for form submission
 signIn.addEventListener('submit', function(event) {
   event.preventDefault();
   userLogin(event);
@@ -199,6 +243,7 @@ signIn.addEventListener('submit', function(event) {
 
 
 
+//todo - add eventlistener on signup butoon for form submission
 signUp.addEventListener('submit', function(event) {
   event.preventDefault();
   userRegistration(event);
