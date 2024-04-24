@@ -12,7 +12,7 @@ let signUp = document.getElementById('si_userForm');
 
 
 
-//TODO - userLogin
+//todo - userLogin
 async function userLogin(e) {
   
   const email = e.target.n_email.value;
@@ -41,55 +41,10 @@ async function userLogin(e) {
 
       localStorage.setItem('token', response.data.token)
       alert(response.data.message);
-      window.location.href = "/home";
+      window.location.href = "/dashboard";
       e.target.n_email.value = '';
       e.target.n_password.value = '';
     
-    } else {
-      throw new Error("Error in credentials");
-    }
-  
-  } catch (err) {
-    document.querySelector("#errorAlert").innerText = `${err.response.data.message}`;
-    alertAwakeSleep();
-    throw new Error(err);
-  }
-
-}
-
-
-
-
-//TODO - userLogin
-async function userLogin(e) {
-
-  const email = e.target.n_email.value;
-  const password = e.target.n_password.value;
-  
-  try {
-    
-    if(!email.trim()) {
-      document.querySelector("#errorAlert").innerText = `Kindly fill email field.!!!`;
-      return alertAwakeSleep();;
-    }
-  
-    if(!password.trim()) {
-      document.querySelector("#errorAlert").innerText = `Kindly fill password field.!!!`;
-      return alertAwakeSleep();
-    }
-  
-    const loginObj = {email, password};
-   
-    let apiURL = `${getAPIURL()}/user/login`;
-    console.log(`URL : ${apiURL}`);
-  
-    const response = await axios.post(apiURL, loginObj);
-    if (response.status === 200) {
-      localStorage.setItem('token', response.data.token)
-      alert(response.data.message);
-      window.location.href = "/home";
-      e.target.n_email.value = '';
-      e.target.n_password.value = '';
     } else {
       throw new Error("Error in credentials");
     }

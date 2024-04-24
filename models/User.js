@@ -32,6 +32,12 @@ const User = sequelize.define("user", {
     allowNull: false,
   },
 
+  status: {
+    type: DataTypes.ENUM('offline', 'online'),
+    allowNull: false,
+    defaultValue: 'offline',
+  },
+
 });
 
 module.exports = User;

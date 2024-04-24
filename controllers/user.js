@@ -7,7 +7,100 @@ const { Sequelize } = require('sequelize');
 
 
 
-//* - signin(authenticatation) Controller
+exports.getAllUsersWithStatus= async(req, res, next) => {
+  
+  try {
+    
+    const users = await User.findAll({
+      attributes: ['name', 'status']
+    });
+   
+    const userNameAndStatus = users.map(user => ({
+      name: user.name,
+      status: user.status,
+    }));
+
+   
+
+    if (userNameAndStatus.length === 0) {
+      return res.status(404).json({ status: 'failed', message: 'No users found', data: null });
+    } else {
+      return res.status(200).json({ status: 'success', message: 'Users found', data: userNameAndStatus });
+    }
+  
+  } catch (error) {
+    throw new Error('Error fetching usernames: ' + error.message);
+  }
+
+}
+
+
+
+
+//* - function to fetch current user information
+exports.getCurrentUserInfo = async(req, res, next) => {
+
+  console.log('-----Request-User-Info------');
+
+  try {
+     
+    console.log('User-Id : ' +req.user.id);
+
+    const userDetails = await User.findOne({
+      attributes: ['name', 'email', 'phone'],
+      where: {
+        id: req.user.id
+      }
+    });
+
+    if (userDetails) {
+
+      console.log('------User Found Successfull-------');
+
+      return res
+      .status(200)
+      .json({
+        status: "success",
+        message: "User found successfull",
+        data: {
+          name: userDetails.name,
+          email: userDetails.email,
+          phone: userDetails.phone
+        },
+      });
+
+    } else {
+
+      console.log('------User Not Found -------')
+
+      return res
+      .status(404)
+      .json({ 
+        status: "Failed", 
+        message: "User not found"
+     });
+
+    }
+
+  } catch(error) {
+  
+    console.error("Error in fetching current user: " +error.message);
+    
+    return res
+        .status(500)
+        .json({ 
+          status: "Failed-Error", 
+          message: "Error-Failed to Found User" 
+        });
+
+  } 
+
+}
+
+
+
+
+//* - function to handles user authentication
 exports.authenticateUser = async(req, res, next) => {
 
   const { email, password } = req.body;
@@ -34,6 +127,7 @@ exports.authenticateUser = async(req, res, next) => {
        
         if(hashresponse) {
           const token = generateAccessToken(user.id, user.name);
+          User.update({ status: 'online' }, { where: { id: user.id } });
           return res.status(200).json({message: 'User logged in successfully', success: true, token : token, data: user});
         } else {
           res.status(401).json({ message: 'User not authorized. Password Incorrect.' , success: false });
@@ -56,7 +150,7 @@ exports.authenticateUser = async(req, res, next) => {
 
 
 
-//* - signup page controller
+//* - function to creates a new user
 exports.createNewUser = async(req, res) => {
     
   try {

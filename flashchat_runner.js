@@ -33,15 +33,19 @@ app.use(express.static(publicPath));
 
 
 app.get("/", (req, res) => {
-  res.sendFile("portal.html", { root: "views" });
+  res.sendFile("/views/portal.html", { root: publicPath });
 });
 
 app.get('/reset-password', (req, res) => {
-  res.sendFile('forgotpassword.html', {root:'views'});
+  res.sendFile('/views/forgotpassword.html', { root: publicPath });
 });
 
-app.get('/home', (req, res) => {
-  res.sendFile('home.html', {root:'views'});
+app.get('/dashboard', (req, res) => {
+  res.sendFile('/views/dashboard.html', { root: publicPath });
+});
+
+app.get('/chat', (req, res) => {
+  res.sendFile('/views/chat.html', { root: publicPath });
 });
 
 
