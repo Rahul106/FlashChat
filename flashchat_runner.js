@@ -13,14 +13,22 @@ const publicPath = path.join(__dirname, "public");
 
 
 
+//models
+const User = require("./models/User");
+const Chat = require('./models/Chat');
+
+
+
 app.use(express.static(publicPath));
+
+
 
 
 
 
 //importing routes
 const userRoute = require("./routes/user");
-
+const chatRoute = require('./routes/chat'); 
 
 
 
@@ -52,7 +60,12 @@ app.get('/chat', (req, res) => {
 
 
 app.use('/user', userRoute);
+app.use('/chat', chatRoute);
 
+
+
+User.hasMany(Chat);
+Chat.belongsTo(User);
 
 
 

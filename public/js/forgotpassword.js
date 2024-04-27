@@ -1,8 +1,3 @@
-const environment = "Local";
-//const environment = "Production";
-
-const LOCAL_AWS_APIURL = 'http://44.212.45.234:4000';
-const LOCAL_WINDOWS_APIURL =  'http://localhost:4000';
 
 let resetBtn = document.getElementById('resetBtn');
 
@@ -30,22 +25,6 @@ async function forgetPasswordLink(e) {
     }
 
 }
-
-
-
-
-//TODO - check Local/Production
-const getAPIURL = () => {
-
-    if (environment.toUpperCase() === 'LOCAL') {
-      return LOCAL_WINDOWS_APIURL;
-    } else if (environment.toUpperCase() === 'PRODUCTION') {
-      return LOCAL_AWS_APIURL;
-    } else {
-      throw new Error('Invalid environment specified');
-    }
-  
-};
 
 
 
