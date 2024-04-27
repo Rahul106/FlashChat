@@ -1,11 +1,3 @@
-const environment = "Local";
-//const environment = "Production";
-
-
-const LOCAL_AWS_APIURL = 'http://44.212.45.234:4000';
-const LOCAL_WINDOWS_APIURL =  'http://localhost:3000';
-
-
 let signIn = document.getElementById("i_signInForm");
 let signUp = document.getElementById('si_userForm');
 
@@ -134,39 +126,6 @@ function userRegistration(e) {
 
 }
   
-
-
-
-//!Homework - Make Below Code Modular
-//TODO - set headers and token
-const getHeaders = () => {
-  const token = localStorage.getItem('token');
-  const headers = {
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': token
-    }
-  };
-
-  return headers;
-};
-
-
-
-
-//TODO - check Local/Production
-const getAPIURL = () => {
-
-  if (environment.toUpperCase() === 'LOCAL') {
-    return LOCAL_WINDOWS_APIURL;
-  } else if (environment.toUpperCase() === 'PRODUCTION') {
-    return LOCAL_AWS_APIURL;
-  } else {
-    throw new Error('Invalid environment specified');
-  }
-
-};
-
 
 
 function alertAwakeSleep() {

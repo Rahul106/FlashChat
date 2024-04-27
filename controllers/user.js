@@ -2,7 +2,6 @@ const User = require('../models/User');
 const bcrypt = require("bcrypt");
 const jwt = require('jsonwebtoken');
 const { isNotValidInput } = require('../utils/validation');
-const { Sequelize } = require('sequelize');
 
 
 
@@ -19,8 +18,6 @@ exports.getAllUsersWithStatus= async(req, res, next) => {
       name: user.name,
       status: user.status,
     }));
-
-   
 
     if (userNameAndStatus.length === 0) {
       return res.status(404).json({ status: 'failed', message: 'No users found', data: null });
