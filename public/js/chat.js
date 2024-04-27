@@ -23,13 +23,14 @@ async function displayUserStatus() {
   
   
   async function createChatBoxes(resp) {
-  
+    
     try {
       
       const chatList = document.querySelector('.chat-list');
-      
       console.log('Response: ' + resp);
-  
+      
+      chatList.innerHTML = '';
+
       resp.data.forEach(user => {
         const chatBox = createChatBoxElement(user);
         attachEventListeners(chatBox, user.name, user.status);
@@ -317,11 +318,19 @@ function  successAlertAwakeSleep() {
   
   
 
-
+async function fetchAndUpdateMessages() {
+  try {
+      const chatContainer = document.querySelector('.chatContainer');
+      const resp = await fetchMessages();
+      populateMessages(chatContainer, resp);
+  } catch (err) {
+      console.error("Error fetching and updating messages:", err);
+  }
+}
 
 document.addEventListener("DOMContentLoaded", function() {
     
-    displayUserStatus();
-  
+  displayUserStatus();
+
 });
   
