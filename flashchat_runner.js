@@ -2,13 +2,15 @@ const express = require("express");
 const app = express();
 const path = require("path");
 const fs = require("fs");
-const bodyParser = require("body-parser");
+//const bodyParser = require("body-parser");
 const sequelize = require("./utils/database");
 
 
 
 
-const publicPath = path.join(__dirname, "public");
+//middleware for user authentication
+const userAuthentication = require('./middlewares/auth');
+
 
 
 
@@ -16,11 +18,28 @@ const publicPath = path.join(__dirname, "public");
 //models
 const User = require("./models/User");
 const Chat = require('./models/Chat');
+const Group = require('./models/Group');
+const Groupmember = require('./models/Groupmember');
+
+
+
+
+
+
+const publicPath = path.join(__dirname, "public");
+const faviconPath = path.join(publicPath, "images", "Ico", "flashchat.ico");
+
 
 
 
 app.use(express.static(publicPath));
 
+
+
+
+//middlewares
+require('dotenv').config();
+app.use(express.json());
 
 
 
@@ -29,15 +48,24 @@ app.use(express.static(publicPath));
 //importing routes
 const userRoute = require("./routes/user");
 const chatRoute = require('./routes/chat'); 
+const groupRoute = require('./routes/group'); 
 
 
 
-//middlewares
-require('dotenv').config();
-app.use(express.json());
-app.use(express.static(publicPath));
 
 
+
+
+app.get(['/images/ico/favicon.ico', '/favicon.ico'], (req, res) => {
+  fs.access(faviconPath, fs.constants.F_OK, (err) => {
+    if (err) {
+      console.error("Favicon.ico file not found:", err);
+      return res.status(404).end();
+    }
+    console.error("Favicon.ico File Found: ", faviconPath);
+    res.sendFile(faviconPath);
+  });
+});
 
 
 app.get("/", (req, res) => {
@@ -59,29 +87,47 @@ app.get('/chat', (req, res) => {
 
 
 
+
+
 app.use('/user', userRoute);
+app.use(userAuthentication.isAuthenticated);
 app.use('/chat', chatRoute);
+app.use('/group', groupRoute);
+
+
 
 
 
 User.hasMany(Chat);
-Chat.belongsTo(User);
+Chat.belongsTo(User, { foreignKey: 'senderId', as: 'sender' });
+Chat.belongsTo(User, { foreignKey: 'receiverId', as: 'receiver' });
+
+Group.belongsToMany(User, {through: Groupmember});
+User.belongsToMany(Group, {through: Groupmember});
 
 
 
-//const PORT = process.env.PORT || 4000;
-const PORT = process.env.PORT || 3000;
-sequelize
-  //.sync({ force: true })
-  .sync()
-  .then(() => {
-    console.log("models synced with database");
-  })
-  .then(() =>
-    app.listen(PORT, () => {
-      console.log(`server is running on port ${PORT}`);
+
+const PORT = process.env.PORT_NO;
+
+function startServer() {
+
+  sequelize
+    //.sync({ force: true })
+    .sync()
+    .then(() => {
+      console.log("Models synced with database");
     })
-  )
-  .catch((err) => {
-    console.error("error syncing models with database:", err);
-  });
+    .then(() => {
+      app.listen(PORT, () => {
+        console.log(`Server is running on port ${PORT}`);
+      });
+    })
+    .catch((err) => {
+      console.error("Error syncing models with database:", err);
+    });
+
+}
+
+startServer();
+

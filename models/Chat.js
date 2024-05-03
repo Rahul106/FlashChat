@@ -3,6 +3,7 @@ const { DataTypes } = require('sequelize');
 const sequelize = require('../utils/database');
 
 
+
 const Chat = sequelize.define('Chat', {
 
   id: {
@@ -12,8 +13,18 @@ const Chat = sequelize.define('Chat', {
     primaryKey: true
   },
 
-  userId: {
+  senderId: {
     type: DataTypes.INTEGER,
+    allowNull: false
+  },
+
+  receiverId: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+  },
+  
+  userType: {
+    type: DataTypes.ENUM('user', 'group'),
     allowNull: false
   },
 
@@ -23,5 +34,6 @@ const Chat = sequelize.define('Chat', {
   }
   
 });
+
 
 module.exports = Chat;

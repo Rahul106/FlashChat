@@ -6,6 +6,27 @@
 //const LOCAL_WINDOWS_APIURL =  'http://localhost:3000';
 
 
+async function fetchCurrentUser() {
+
+  try {
+      
+    return new Promise(async (resolve, reject) => {
+      
+      let apiURL = `${getAPIURL()}/user/current-user`;
+      console.log(`URL : ${apiURL}`);
+    
+      const response = await axios.get(apiURL, getHeaders());
+      resolve(response);
+
+    })
+
+  } catch (err) {
+      console.log(err);
+  }
+  
+}
+
+
 
 
 //TODO - Fetching current user info
