@@ -7,6 +7,8 @@ const LOCAL_WINDOWS_APIURL =  'http://localhost:3000';
 
 
 
+
+
 //!Homework - Make Below Code Modular
 //TODO - set headers and token
 const getHeaders = () => {
@@ -68,5 +70,3 @@ const getHeaders = () => {
   }
   
   
-
-

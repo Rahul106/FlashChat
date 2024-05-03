@@ -1,3 +1,5 @@
+const Sequelize = require('sequelize');
+const { Op } = Sequelize;
 const User = require('../models/User');
 const bcrypt = require("bcrypt");
 const jwt = require('jsonwebtoken');
@@ -11,12 +13,19 @@ exports.getAllUsersWithStatus= async(req, res, next) => {
   try {
     
     const users = await User.findAll({
-      attributes: ['name', 'status']
+      attributes: ['id', 'name', 'status'],
+      where: {
+        id: {
+          [Sequelize.Op.not]: req.user.id
+        }
+      }
     });
+    
    
     const userNameAndStatus = users.map(user => ({
+      id: user.id,
       name: user.name,
-      status: user.status,
+      status: user.status
     }));
 
     if (userNameAndStatus.length === 0) {
@@ -44,7 +53,7 @@ exports.getCurrentUserInfo = async(req, res, next) => {
     console.log('User-Id : ' +req.user.id);
 
     const userDetails = await User.findOne({
-      attributes: ['name', 'email', 'phone'],
+      attributes: ['id', 'name', 'email', 'phone'],
       where: {
         id: req.user.id
       }
@@ -60,6 +69,7 @@ exports.getCurrentUserInfo = async(req, res, next) => {
         status: "success",
         message: "User found successfull",
         data: {
+          userId : userDetails.id,
           name: userDetails.name,
           email: userDetails.email,
           phone: userDetails.phone
