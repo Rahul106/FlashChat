@@ -105,6 +105,8 @@ Chat.belongsTo(User, { foreignKey: 'receiverId', as: 'receiver' });
 Group.belongsToMany(User, {through: Groupmember});
 User.belongsToMany(Group, {through: Groupmember});
 
+// Group.belongsToMany(User, { through: Groupmember, as: 'admins' });
+// User.belongsToMany(Group, { through: Groupmember, as: 'adminOf' });
 
 
 

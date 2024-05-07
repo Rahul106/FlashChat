@@ -1,78 +1,146 @@
 const groupUsersIcon = document.getElementById('groupUsersIcon');
 const createGroup = document.getElementById('createGroup');
+let editId = 0;
 
 
 
 
-
-createGroup.addEventListener("click", async function() {
-
-    const groupName = document.getElementById('groupName').value;
-    const groupImage = document.getElementById('groupImage').value;
+async function fetchGroupMembers(groupId) {
   
-    const selectedUsers = [];
-    const checkboxes = document.querySelectorAll('.user-selection input[type="checkbox"]');
+  let apiURL = `${getAPIURL()}/group/get-groupmembers/${groupId}`;
+
+  try {
     
-    checkboxes.forEach(checkbox => {
-      
-      if (checkbox.checked) {
-        
-        const label = document.querySelector(`label[for="${checkbox.id}"]`);
-        const userId = checkbox.id.replace('user', ''); 
-        const username = label.textContent.trim(); 
-        
-        selectedUsers.push({
-            checkboxId: checkbox.id,
-            userId: userId,
-            username: username
-        });
-        
-      }
+    const response = await axios.get(apiURL, getHeaders());
+    return response; 
+    
+  } catch (error) {
+      console.error('Error fetching user data:', error);
+  }
   
+}
+
+
+
+
+
+const editGroupListener = async (header, grpId, grpName) => {
+
+  const editButton = header.querySelector('.fa-edit');
+ 
+  editButton.addEventListener('click', async function() {
+
+    const response = await fetchAllUsers();
+
+    const groupMembersResponse = await fetchGroupMembers(grpId);
+    const groupMembers = groupMembersResponse.data;
+
+    const modalTitle = document.getElementById('exampleModalCenterTitle');
+    modalTitle.textContent = 'Edit Group';
+
+    const groupName = document.getElementById('groupName');
+    groupName.value = grpName;
+
+    const createGroupButton = document.getElementById('createGroup');
+    createGroupButton.textContent = modalTitle.textContent.trim() === 'Edit Group' ? 'Save Changes' : 'Create Group';
+    populateUserSelection(response, groupMembers.groupMembers);
+    editId = grpId;
+
+    $('#exampleModalCenter').on('hidden.bs.modal', function () {
+      modalTitle.textContent = 'Create Group';
+      createGroupButton.textContent = 'Create Group';
+
+      const formInputs = document.querySelectorAll('#exampleModalCenter input');
+      formInputs.forEach(input => {
+          input.value = '';
+      });
+
+      const checkboxes = document.querySelectorAll('.user-selection input[type="checkbox"]');
+      checkboxes.forEach(checkbox => {
+          checkbox.checked = false;
+      });
     });
-  
-    formGroup(groupName, groupImage, selectedUsers);
-  
-});
-  
-  
-  
+    
+  });
+
+};
 
 
+
+
+
+function initiateGroup(isEdit) {
+
+  const groupName = document.getElementById('groupName').value;
+  const groupImage = document.getElementById('groupImage').value;
+
+  const selectedUsers = [];
+  const checkboxes = document.querySelectorAll('.user-selection input[type="checkbox"]');
   
-async function formGroup(gName, gImage, sUsers) {
-  
-    console.log('Group Name:', gName);
-    console.log('Group Image:', gImage);
-    console.log('Selected Users:', sUsers);
-  
-    const groupInfo = {
-      groupName: gName,
-      groupImage: gImage,
-      selectedUsers: sUsers
-    };
-  
-    try {
-  
-      const apiURL = `${getAPIURL()}/group/create-group`;
-      console.log(`URL : ${apiURL}`);
-  
-      const response = await axios.post(apiURL, groupInfo, getHeaders());
-      console.log('Message sent successfully:', response.data);
-  
-      console.log('<---Group-Name---> : ' +response.data.group.groupName);
-      console.log('<---Group-Id-----> : ' +response.data.group.id);
-      console.log('<---Group-User---> : ' +response.data.group.adminId);
-  
-      displayUserStatus();
-      fetchCurrentUserGroups();
-  
-    } catch(err) {
-      document.querySelector("#errorAlert").innerText = `${err.response.data.message}`;
-      alertAwakeSleep();
-      throw new Error(err);
+  checkboxes.forEach(checkbox => {
+    if (checkbox.checked) {
+      const label = document.querySelector(`label[for="${checkbox.id}"]`);
+      const userId = checkbox.id.replace(/user|adminUser/, '');
+      const username = label.textContent.trim(); 
+      
+      selectedUsers.push({
+        checkboxId: checkbox.id,
+        userId: userId,
+        username: username
+      });
     }
+  });
+
+  formGroup(groupName, groupImage, selectedUsers, isEdit);
   
+};
+  
+  
+  
+
+
+  
+async function formGroup(gName, gImage, sUsers, isEdit) {
+  
+  console.log('Group Name:', gName);
+  console.log('Group Image:', gImage);
+  console.log('Selected Users:', sUsers);
+
+  const groupInfo = {
+    groupName: gName,
+    groupImage: gImage,
+    selectedUsers: sUsers
+  };
+  
+  try {
+    
+    const apiURL = (!isEdit) ? `${getAPIURL()}/group/create-group` : `${getAPIURL()}/group/edit-group/${editId}`; 
+    console.log(`URL : ${apiURL}`);
+
+    const response = await axios.post(apiURL, groupInfo, getHeaders());
+    console.log('Message sent successfully:', response.data);
+
+    console.log('<---Group-Name---> : ', response.data.group.groupName);
+    console.log('<---Group-Id-----> : ', response.data.group.id);
+    console.log('<---Group-User---> : ', response.data.group.adminId);
+
+    const resp = await displayUserStatus();
+    createChatBoxes(resp);
+    fetchCurrentUserGroups();
+
+    $('#exampleModalCenter').on('hidden.bs.modal', function () {
+      const formInputs = document.querySelectorAll('#exampleModalCenter input');
+      formInputs.forEach(input => {
+        input.value = '';
+      });
+    });
+
+  } catch(err) {
+    document.querySelector("#errorAlert").innerText = `${err.response.data.message}`;
+    alertAwakeSleep();
+    throw new Error(err);
+  }
+
 }
   
 
@@ -81,14 +149,16 @@ async function formGroup(gName, gImage, sUsers) {
 
 function renderGroups(chatList, groupsArr, userId) {
   
-    groupsArr.forEach(group => {
-      const isAdmin = group.adminId === userId;
-      const chatBox = renderGroupOnScreen(group.groupName, group.id, isAdmin);
-      attachEventListeners(chatBox, group.id, group.groupName, '', chatTypeOptions.Group);
-      chatList.appendChild(chatBox);
-    });
-  
-  }
+  groupsArr.forEach(group => {
+    console.log(group);
+    console.log(group.groupmembers);
+    const isAdmin = group.groupmembers.isAdmin;
+    const chatBox = renderGroupOnScreen(group.groupName, group.id, isAdmin);
+    attachEventListeners(chatBox, group.id, group.groupName, '', chatTypeOptions.Group, isAdmin);
+    chatList.appendChild(chatBox);
+  });
+
+}
   
   
   
@@ -139,7 +209,7 @@ function renderGroups(chatList, groupsArr, userId) {
 async function fetchCurrentUserGroups() {
 
     const chatList = document.querySelector('.chat-list');  
-    chatList.innerHTML = '';
+    //chatList.innerHTML = '';
   
     try {
   
@@ -169,49 +239,114 @@ async function fetchCurrentUserGroups() {
 
 
 
+async function fetchAllUsers() {
+  
+  let apiURL = `${getAPIURL()}/user/users-status`;
 
-async function populateUserSelection() {
+  try {
+
+    const response = await axios.get(apiURL, getHeaders());
+    return response; 
+    
+  } catch (error) {
+      console.error('Error fetching user data:', error);
+  }
   
-    const userSelectionDiv = document.querySelector('.user-selection');
-    userSelectionDiv.innerHTML = ''; 
+}
+
+
+
+
+
+
+
+function populateUserSelection(resp, groupMembers = []) {
   
-    let apiURL = `${getAPIURL()}/user/users-status`;
- 
-    try {
-  
-      const response = await axios.get(apiURL, getHeaders());
-      const users = response.data.data;
-      
-      users.forEach(user => {
-        const checkbox = document.createElement('input');
-        checkbox.type = 'checkbox';
-        checkbox.id = `user${user.id}`;
-        checkbox.name = `user${user.id}`;
-        
-        const label = document.createElement('label');
-        label.htmlFor = `user${user.id}`;
-        label.textContent = user.name;
-        
-        label.style.marginRight = '10px'; 
-        label.style.color = '#007bff'; 
-        userSelectionDiv.appendChild(checkbox);
-        userSelectionDiv.appendChild(label);
-        userSelectionDiv.appendChild(document.createElement('br')); 
-      });
-  
-    } catch (error) {
-        console.error('Error fetching user data:', error);
-    }
-  
+  const userSelectionDiv = document.querySelector('.user-selection');
+  userSelectionDiv.innerHTML = ''; 
+
+  resp.data.data.forEach(user => {
+    
+    const { id, name } = user;
+    console.log('User-Id', user.id);
+
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.id = `user${user.id}`;
+    checkbox.name = `user${user.id}`;
+    checkbox.style.marginLeft = '17px'; 
+    checkbox.checked = groupMembers.some(member => member.id === user.id);
+
+    const label = document.createElement('label');
+    label.htmlFor = `user${user.id}`;
+    label.textContent = user.name;
+    label.style.marginLeft = '8px';
+    label.style.color = '#007bff'; 
+
+    const adminCheckbox = document.createElement("input");
+    adminCheckbox.type = "checkbox";
+    adminCheckbox.id = `adminUser${user.id}`;
+    adminCheckbox.name = `adminUser${user.id}`;
+    adminCheckbox.style.marginLeft = "17px";
+
+    const adminLabel = document.createElement("label");
+    adminLabel.htmlFor = `adminUser${user.id}`;
+    adminLabel.textContent = "admin";
+    adminLabel.style.marginLeft = "8px";
+    adminLabel.style.color = "#FF0000";
+    
+    
+    const isAdmin = groupMembers.some(m => m.id === id && m.groupmembers.isAdmin);
+    adminCheckbox.checked = isAdmin;
+    adminCheckbox.disabled = !checkbox.checked;
+
+    checkbox.addEventListener('change', function() {
+      adminCheckbox.disabled = !this.checked;
+    });
+
+    userSelectionDiv.appendChild(checkbox);
+    userSelectionDiv.appendChild(label);
+    userSelectionDiv.appendChild(adminCheckbox);
+    userSelectionDiv.appendChild(adminLabel);
+    userSelectionDiv.appendChild(document.createElement("br")); 
+
+  });
+
 }
   
 
 
 
 
-groupUsersIcon.addEventListener('click', function() {
+createGroup.addEventListener("click", function() {
 
-    populateUserSelection();
+  const createGroupButton = document.getElementById('createGroup');
+  
+  if (createGroupButton) {
+    const createGroupButtonText = createGroupButton.textContent.trim();
+  
+    if (createGroupButtonText === 'Create Group') {
+      initiateGroup(false);
+    } else if (createGroupButtonText === 'Save Changes') {
+      initiateGroup(true);
+    } else {
+      alert('Unexpected button text: ' + createGroupButtonText);
+    }
+  } else {
+    alert('Button not found');
+  }
+
+});
+
+
+
+
+
+
+groupUsersIcon.addEventListener('click', async function() {
+
+  const response = await fetchAllUsers();
+  populateUserSelection(response);
   
 });
 
@@ -221,7 +356,6 @@ groupUsersIcon.addEventListener('click', function() {
 
 document.addEventListener("DOMContentLoaded", async function() {
 
-    //displayUserStatus();
-    fetchCurrentUserGroups();
+  fetchCurrentUserGroups();
   
-  });
+});
