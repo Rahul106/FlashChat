@@ -11,23 +11,23 @@ const chatTypeOptions = {
 
 async function displayUserStatus() {
 
-    try {
-  
-      let apiURL = `${getAPIURL()}/user/users-status`;
-      console.log(`URL : ${apiURL}`);
-    
-      const response = await axios.get(apiURL, getHeaders());
-      console.log('User status : ' , response.data.data);
+  try {
 
-      createChatBoxes(response.data);
+    let apiURL = `${getAPIURL()}/user/users-status`;
+    console.log(`URL : ${apiURL}`);
   
-    } catch (err) {
-      document.querySelector("#errorAlert").innerText = `${err.response.data.message}`;
-      alertAwakeSleep();
-      throw new Error(err);
-    }
+    const response = await axios.get(apiURL, getHeaders());
+    console.log('User status : ' , response.data.data);
     
-    }
+    return response;
+    
+  } catch (err) {
+    document.querySelector("#errorAlert").innerText = `${err.response.data.message}`;
+    alertAwakeSleep();
+    throw new Error(err);
+  }
+  
+}
   
   
   
@@ -39,7 +39,7 @@ async function displayUserStatus() {
       const chatList = document.querySelector('.chat-list');  
       chatList.innerHTML = '';
 
-      resp.data.forEach(user => {
+      resp.data.data.forEach(user => {
         const chatBox = createChatBoxElement(user);
         attachEventListeners(chatBox, user.id, user.name, user.status, chatTypeOptions.User)
         chatList.appendChild(chatBox);
@@ -86,26 +86,26 @@ function createChatBoxElement(user) {
   
   
   
-function attachEventListeners(chatBox, receiverId, userName, status, uType) {
-    
+function attachEventListeners(chatBox, receiverId, userName, status, uType, isAdmin) {
+
   const imgBoxDiv = chatBox.querySelector('.img-box');
   imgBoxDiv.addEventListener('click', () => {
     console.log('Clicked on img-box');
-    showChatDetails(receiverId, userName, status, uType);
+    showChatDetails(receiverId, userName, status, uType, isAdmin);
   });
 
 
   const chatDetailsDiv = chatBox.querySelector('.chat-details');
   chatDetailsDiv.addEventListener('click', () => {
     console.log('Clicked on chat-details');
-    showChatDetails(receiverId, userName, status, uType);
+    showChatDetails(receiverId, userName, status, uType, isAdmin);
   });
 
 
   const userStatusDiv = chatBox.querySelector('.user-status');
   userStatusDiv.addEventListener('click', () => {
     console.log('Clicked on user-status');
-    showChatDetails(receiverId, userName, status, uType);
+    showChatDetails(receiverId, userName, status, uType, isAdmin);
   });
     
 }
@@ -113,12 +113,15 @@ function attachEventListeners(chatBox, receiverId, userName, status, uType) {
   
   
   
-async function showChatDetails(receiverId, userName, status, uType) {
-  
+async function showChatDetails(receiverId, userName, status, uType, isAdmin) {
+ 
     const rightContainer = document.querySelector('.right-container');
     rightContainer.innerHTML = '';
   
-    const header = createHeader(userName, status);
+    const header = createHeader(userName, status, isAdmin);
+    if(isAdmin) {
+      editGroupListener(header, receiverId, userName);
+    }
     rightContainer.appendChild(header);
    
     const chatContainer = createChatContainer();
@@ -160,25 +163,32 @@ async function fetchMessages(receiverId, uType) {
   
   
   
-function createHeader(userName, status) {
-    
-    const header = document.createElement('div');
-    header.classList.add('header');
-    
-    header.innerHTML = `
-      <div class="img-text">
-        <div class="user-img">
-          <img class="dp" src="https://images.pexels.com/photos/2474307/pexels-photo-2474307.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" alt="">
-        </div>
-        <h4>${userName}<br><span>${status}</span></h4>
+function createHeader(userName, status, isAdmin) {
+ 
+  const header = document.createElement('div');
+  header.classList.add('header');
+  
+  let editIconHTML = '';
+  if (isAdmin) {  
+    editIconHTML = '<li><i class="fa-solid fa-edit" id="groupUsersIcon" data-toggle="modal" data-target="#exampleModalCenter"></i></li>';
+  }
+
+  header.innerHTML = `
+    <div class="img-text">
+      <div class="user-img">
+        <img class="dp" src="https://images.pexels.com/photos/2474307/pexels-photo-2474307.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" alt="">
       </div>
-      <div class="nav-icons">
-        <li><i class="fa-solid fa-magnifying-glass"></i></li>
-        <li><i class="fa-solid fa-ellipsis-vertical"></i></li>
-      </div>
-    `;
-    
-    return header;
+      <h4>${userName}<br><span>${status}</span></h4>
+    </div>
+    <div class="nav-icons">
+      ${editIconHTML}
+      <li><i class="fa-solid fa-magnifying-glass"></i></li>
+      <li><i class="fa-solid fa-ellipsis-vertical"></i></li>
+    </div>
+  `;
+  
+  return header;
+
 }
   
   
@@ -221,6 +231,7 @@ function createMessageBox(message, currentId) {
   const messageBox = document.createElement('div');
   messageBox.classList.add('message-box');
   messageBox.classList.add(message.senderId === currentId ? 'my-message' : 'friend-message');
+  
   messageBox.innerHTML = `
   <p><strong>${message.senderName}</strong><br>
   <span>${message.message}</span></p>
@@ -279,6 +290,7 @@ function attachSendMessageEvent(chatboxinput, receiverId, userName, uType) {
   
   
   
+
   
 async function sendMessage(uName, recId, msg, uType) {
   
@@ -316,6 +328,7 @@ async function sendMessage(uName, recId, msg, uType) {
   
 
 
+
 async function fetchNewMessages(recentMsgId) {
   
   try {
@@ -336,6 +349,7 @@ async function fetchNewMessages(recentMsgId) {
   }
 
 }
+
 
 
 
@@ -363,56 +377,9 @@ async function recentMessage(recMsgId = null) {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
-  
-// function alertAwakeSleep() {
-      
-//     document.querySelector("#errorAlert").classList.toggle("hidden");
-    
-//     setTimeout(function () {
-//       document.getElementById("errorAlert").classList.toggle("hidden");
-//     }, 1500);
-  
-// }
-  
-  
-  
-  
-  
-// function  successAlertAwakeSleep() {
-  
-//     document.querySelector("#successAlert").classList.toggle("hidden");
-    
-//     setTimeout(function () {
-//       document.getElementById("successAlert").classList.toggle("hidden");
-//     }, 2000);
-  
-// }
-  
-  
-
-
 document.addEventListener("DOMContentLoaded", async function() {
 
-  displayUserStatus();
-  //fetchCurrentUserGroups();
+  const response = await displayUserStatus();
+  createChatBoxes(response);
 
 });

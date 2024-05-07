@@ -15,10 +15,10 @@ const Group = sequelize.define('groups', {
         allowNull: false,
     },
 
-    adminId: {
-        type: DataTypes.INTEGER,
-        allowNull:false
-    },
+    // adminId: {
+    //     type: DataTypes.INTEGER,
+    //     allowNull:false
+    // },
 
     totalUsers: {
         type: DataTypes.INTEGER,

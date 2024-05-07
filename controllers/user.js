@@ -20,7 +20,6 @@ exports.getAllUsersWithStatus= async(req, res, next) => {
         }
       }
     });
-    
    
     const userNameAndStatus = users.map(user => ({
       id: user.id,
