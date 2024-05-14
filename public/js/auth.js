@@ -1,3 +1,4 @@
+
 let signIn = document.getElementById("i_signInForm");
 let signUp = document.getElementById('si_userForm');
 
@@ -6,7 +7,7 @@ let signUp = document.getElementById('si_userForm');
 
 //todo - userLogin
 async function userLogin(e) {
-  
+   
   const email = e.target.n_email.value;
   const password = e.target.n_password.value;
   
@@ -21,12 +22,12 @@ async function userLogin(e) {
       document.querySelector("#errorAlert").innerText = `Kindly fill password field.!!!`;
       return alertAwakeSleep();
     }
-  
+    
     const loginObj = { email, password };
    
     let apiURL = `${getAPIURL()}/user/login`;
     console.log(`URL : ${apiURL}`);
-  
+    
     const response = await axios.post(apiURL, loginObj);
 
     if (response.status === 200) {
@@ -151,6 +152,7 @@ function successAlertAwakeSleep() {
 //todo - add eventlistener on signin butoon for form submission
 signIn.addEventListener('submit', function(event) {
   event.preventDefault();
+  
   userLogin(event);
 });
 

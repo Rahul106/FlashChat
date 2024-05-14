@@ -5,8 +5,6 @@ const User = require('../models/User');
 
 
 
-
-
 exports.editGroup = async (req, res) => {
 
     try {
@@ -50,55 +48,9 @@ exports.editGroup = async (req, res) => {
             existingGroup.groupName = groupName;
         }
 
-        if (existingGroup.groupImage !== groupImage) {
-            existingGroup.groupImage = groupImage;
+        if (existingGroup.imgpath !== groupImage) {
+            existingGroup.imgpath = groupImage;
         }
-
-        // Update group members if they have changed
-        // const existingMembers = await existingGroup.getUsers();
-        
-        // const existingMemberIds = existingMembers.map(member => member.id);
-        // console.log('--Existing-ID--' +existingMemberIds);
-
-        // const filteredSelectedUsers = selectedUsers.filter(user => user.username !== 'admin');
-        // const selectedUserIds = filteredSelectedUsers.map(user => user.userId);
-        // selectedUserIds.push(req.user.id);
-        // console.log('--CurrentlySelected-ID--' + selectedUserIds);
-
-        // const adminUserIds = selectedUsers.filter(user => user.username === 'admin').map(user => parseInt(user.userId));
-        // adminUserIds.push(req.user.id);
-        // console.log('--Admin User IDs--', adminUserIds);
-
-        // const removedMembers = existingMemberIds.filter(id => !selectedUserIds.includes(id));
-        // for (const memberId of removedMembers) {
-        //     await existingGroup.removeUser(memberId);
-        //     console.log('User removed from group:', memberId); 
-        // }
-
-        // const newMembers = selectedUserIds.filter(id => !existingMemberIds.includes(id));
-        // for (const memberId of newMembers) {
-        //     await existingGroup.addUser(memberId);
-        //     console.log('User added to group:', memberId);
-        // }
-        
-        
-
-        // existingGroup.save();
-
-        //     for (const adminId of adminUserIds) {
-        //         console.log('----=-=-' ,adminId);
-        //         console.log('----=-=-----' ,groupId);
-        //       await Groupmember.update(
-        //         { isAdmin: true },
-        //         {
-        //           where: {
-        //             userId: adminId,
-        //             groupId: groupId
-        //           }
-        //         }
-        //       );
-        //     }
-          
           
         const existingMemberIds = (await existingGroup.getUsers()).map(member => member.id);
         const selectedUserIds = selectedUsers.filter(user => user.username !== 'admin').map(user => user.userId);
@@ -115,6 +67,7 @@ exports.editGroup = async (req, res) => {
             existingGroup.addUsers(newMembers)
         ]);
 
+        existingGroup.save();
         await updateIsAdminForAdminIds(adminUserIds, groupId);
 
         res.status(200).json({ group: existingGroup, message: 'Group updated successfully.' });
@@ -180,7 +133,7 @@ exports.getCurrentUserGroups = async (req, res) => {
         
         //console.log(Object.keys(Group.prototype));
         //console.log(Object.keys(User.prototype));
-        
+    
         const groups = await req.user.getGroups();
         
         if (groups) {
@@ -223,13 +176,16 @@ exports.createGroup = async (req, res) => {
 
         console.log('Group-Image : ', groupImage);
         console.log('Group-Name : ', groupName);
+        console.log('Selected-User : ', selectedUsers);
 
         const userIds = [];
         const adminIds = [];
         for (const user of selectedUsers) {
-            if (user.userId.startsWith('adminUser')) {
-                adminIds.push(parseInt(user.userId.replace('adminUser', '')));
+            if (user.checkboxId.startsWith('adminUser')) {
+                console.log('----xx---' +user.checkboxId);
+                adminIds.push(parseInt(user.checkboxId.replace('adminUser', '')));
             } else {
+                console.log('-------' +user.userId);
                 userIds.push(parseInt(user.userId));
             }
         }
@@ -244,7 +200,8 @@ exports.createGroup = async (req, res) => {
         console.log('Total-Admins : ', adminIds.length);
 
         const group = await Group.create({ 
-            groupName: groupName, 
+            groupName: groupName,
+            imgpath: groupImage,
             totalUsers: userIds.length,
         });
 

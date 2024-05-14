@@ -210,7 +210,7 @@ body.dark .sidebar li a:hover .text{
     color: var(--text-color);
 }
 
-.sidebar .menu-bar{
+.sidebars .menu-bar{
     height: calc(100% - 55px);
     display: flex;
     flex-direction: column;

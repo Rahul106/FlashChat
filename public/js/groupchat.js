@@ -1,7 +1,33 @@
 const groupUsersIcon = document.getElementById('groupUsersIcon');
 const createGroup = document.getElementById('createGroup');
+let picInput = document.querySelector(".img");
+//let file = document.getElementById("imgInput");
 let editId = 0;
 
+
+
+
+const msgTypeOptions = {
+  User: 'user',
+  Group: 'group'
+};
+
+
+file.onchange = function(){
+  if(file.files[0].size < 1000000){  // 1MB = 1000000
+      var fileReader = new FileReader();
+
+      fileReader.onload = function(e){
+          imgUrl = e.target.result
+          picInput.src = imgUrl
+      }
+
+      fileReader.readAsDataURL(file.files[0])
+  }
+  else{
+      alert("This file is too large!")
+  }
+}
 
 
 
@@ -24,7 +50,7 @@ async function fetchGroupMembers(groupId) {
 
 
 
-const editGroupListener = async (header, grpId, grpName) => {
+ const editGroupListener = async (header, grpId, grpName) => {
 
   const editButton = header.querySelector('.fa-edit');
  
@@ -42,7 +68,7 @@ const editGroupListener = async (header, grpId, grpName) => {
     groupName.value = grpName;
 
     const createGroupButton = document.getElementById('createGroup');
-    createGroupButton.textContent = modalTitle.textContent.trim() === 'Edit Group' ? 'Save Changes' : 'Create Group';
+    createGroupButton.textContent = modalTitle.textContent.trim() === 'Edit Group' ? 'Save Change' : 'Create Group';
     populateUserSelection(response, groupMembers.groupMembers);
     editId = grpId;
 
@@ -72,7 +98,7 @@ const editGroupListener = async (header, grpId, grpName) => {
 function initiateGroup(isEdit) {
 
   const groupName = document.getElementById('groupName').value;
-  const groupImage = document.getElementById('groupImage').value;
+  const groupImage = picInput.src;
 
   const selectedUsers = [];
   const checkboxes = document.querySelectorAll('.user-selection input[type="checkbox"]');
@@ -105,7 +131,7 @@ async function formGroup(gName, gImage, sUsers, isEdit) {
   console.log('Group Name:', gName);
   console.log('Group Image:', gImage);
   console.log('Selected Users:', sUsers);
-
+ 
   const groupInfo = {
     groupName: gName,
     groupImage: gImage,
@@ -153,8 +179,8 @@ function renderGroups(chatList, groupsArr, userId) {
     console.log(group);
     console.log(group.groupmembers);
     const isAdmin = group.groupmembers.isAdmin;
-    const chatBox = renderGroupOnScreen(group.groupName, group.id, isAdmin);
-    attachEventListeners(chatBox, group.id, group.groupName, '', chatTypeOptions.Group, isAdmin);
+    const chatBox = renderGroupOnScreen(group.groupName, group.id, group.imgpath, isAdmin);
+    attachEventListeners(chatBox, group, msgTypeOptions.Group, isAdmin);
     chatList.appendChild(chatBox);
   });
 
@@ -164,8 +190,8 @@ function renderGroups(chatList, groupsArr, userId) {
   
   
   
-  function renderGroupOnScreen(groupName, groupId, isAdmin) {
-    
+  function renderGroupOnScreen(groupName, groupId, groupDp, isAdmin) {
+   
     const newGroup = document.createElement('div');
     newGroup.classList.add('chat-box');
   
@@ -174,7 +200,7 @@ function renderGroups(chatList, groupsArr, userId) {
   
     newGroup.innerHTML = `
         <div class="img-box">
-          <img class="img-cover" src="/images/profile/profile1.webp" alt="profileImg">
+          <img class="img-cover" src="${groupDp}" alt="profileImg" width="50" height="50">
           <div class="hidden-id" style="display: none;">${newGroup.id}</div>     
         </div>
         <div class="chat-details">
@@ -207,20 +233,20 @@ function renderGroups(chatList, groupsArr, userId) {
 
 
 async function fetchCurrentUserGroups() {
-
+  
     const chatList = document.querySelector('.chat-list');  
     //chatList.innerHTML = '';
   
     try {
-  
+    
       let apiURL = `${getAPIURL()}/group/get-mygroups`;
       console.log('URL : ', apiURL);
-  
+      
       const response = await Promise.all([
         fetchCurrentUser(), 
         axios.get(apiURL, getHeaders())
       ]);
-  
+      console.log('======', response);
       console.log('User-Details : ', response[0].data.data.userId);
       console.log('Groups-Details : ', response[1].data.groups);
   
@@ -295,7 +321,6 @@ function populateUserSelection(resp, groupMembers = []) {
     adminLabel.style.marginLeft = "8px";
     adminLabel.style.color = "#FF0000";
     
-    
     const isAdmin = groupMembers.some(m => m.id === id && m.groupmembers.isAdmin);
     adminCheckbox.checked = isAdmin;
     adminCheckbox.disabled = !checkbox.checked;
@@ -327,7 +352,7 @@ createGroup.addEventListener("click", function() {
   
     if (createGroupButtonText === 'Create Group') {
       initiateGroup(false);
-    } else if (createGroupButtonText === 'Save Changes') {
+    } else if (createGroupButtonText === 'Save Change') {
       initiateGroup(true);
     } else {
       alert('Unexpected button text: ' + createGroupButtonText);
@@ -355,7 +380,10 @@ groupUsersIcon.addEventListener('click', async function() {
 
 
 document.addEventListener("DOMContentLoaded", async function() {
-
+  
   fetchCurrentUserGroups();
   
 });
+
+
+

@@ -14,6 +14,7 @@ document.addEventListener("DOMContentLoaded", function() {
             const scriptElement = document.createElement("script");
 
             // Step 5: Path to your javaScript file
+            //scriptElement.type = "module"; 
             scriptElement.src = "/js/sidebar.js"; 
             document.body.appendChild(scriptElement);
         });

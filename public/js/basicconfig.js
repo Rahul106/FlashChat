@@ -59,7 +59,7 @@ const getHeaders = () => {
   
   
   
-  function  successAlertAwakeSleep() {
+  function successAlertAwakeSleep() {
   
     document.querySelector("#successAlert").classList.toggle("hidden");
     

@@ -33,6 +33,12 @@ const User = sequelize.define("user", {
     allowNull: false,
   },
 
+  imgpath: {
+    type: DataTypes.TEXT, 
+    allowNull: false,
+    defaultValue: 'https://www.codewithfaraz.com/InstaPic.png' 
+  },
+
   status: {
     type: DataTypes.ENUM('offline', 'online'),
     allowNull: false,

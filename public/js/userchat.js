@@ -1,9 +1,123 @@
+let imgInput = document.querySelector(".img");
+let file = document.getElementById("imgInput");
 let lastMessageId = null;
+let currentEmoji = '';
+
 
 const chatTypeOptions = {
   User: 'user',
   Group: 'group'
 };
+
+
+
+
+
+
+
+const emoList = `
+<div class="parentConatiner elevated" id="pContainer">
+                    
+  <div class="childContainer" id="cContainer">
+    <div class="childSubContainer reaction" onclick="appendEmoji('😊')">😊</div>
+    <div class="childSubContainer reaction" onclick="appendEmoji('😄')">😄</div>
+    <div class="childSubContainer reaction" onclick="appendEmoji('🙂')">🙂</div>
+    <div class="childSubContainer reaction" onclick="appendEmoji('😍')">😍</div>
+    <div class="childSubContainer reaction" onclick="appendEmoji('😂')">😂</div>
+    <div class="childSubContainer reaction" onclick="appendEmoji('😎')">😎</div>
+    <div class="childSubContainer reaction" onclick="appendEmoji('😜')">😜</div>
+    <div class="childSubContainer reaction" onclick="appendEmoji('😇')">😇</div>
+    <div class="childSubContainer reaction" onclick="appendEmoji('🤬')"> 🤬</div>
+    <div class="childSubContainer reaction" onclick="appendEmoji('😭')">😭</div>
+  </div>
+
+  <div class="childContainer" id="cContainer">
+    <div class="childSubContainer animal" onclick="appendEmoji('🐶')">🐶</div>
+    <div class="childSubContainer animal" onclick="appendEmoji('🐱')">🐱</div>
+    <div class="childSubContainer animal" onclick="appendEmoji('🐭')">🐭</div>
+    <div class="childSubContainer animal" onclick="appendEmoji('🐰')">🐰</div>
+    <div class="childSubContainer animal" onclick="appendEmoji('🐼')">🐼</div>
+    <div class="childSubContainer animal" onclick="appendEmoji('🐨')">🐨</div>
+    <div class="childSubContainer animal" onclick="appendEmoji('🐻')">🐻</div>
+    <div class="childSubContainer animal" onclick="appendEmoji('🐷')">🐷</div>
+    <div class="childSubContainer animal" onclick="appendEmoji('🐮')">🐮</div>
+    <div class="childSubContainer animal" onclick="appendEmoji('🐸')">🐸</div>
+  </div>
+     
+  <div class="childContainer" id="cContainer">
+    <div class="childSubContainer food" onclick="appendEmoji('🍔')">🍔</div>
+    <div class="childSubContainer food" onclick="appendEmoji('🍕')">🍕</div>
+    <div class="childSubContainer food" onclick="appendEmoji('🍟')">🍟</div>
+    <div class="childSubContainer food" onclick="appendEmoji('🌭')">🌭</div>
+    <div class="childSubContainer food" onclick="appendEmoji('🍿')">🍿</div>
+    <div class="childSubContainer food" onclick="appendEmoji('🥪')">🥪</div>
+    <div class="childSubContainer food" onclick="appendEmoji('🍣')">🍣</div>
+    <div class="childSubContainer food" onclick="appendEmoji('🍦')">🍦</div>
+    <div class="childSubContainer food" onclick="appendEmoji('🍩')">🍩</div>
+    <div class="childSubContainer food" onclick="appendEmoji('🍰')">🍰</div>
+  </div>
+  
+  <div class="childContainer" id="cContainer">
+  <div class="childSubContainer sport" onclick="appendEmoji('🏋️‍♂️')">🏋️‍♂️</div>
+  <div class="childSubContainer sport" onclick="appendEmoji('🏋️‍♀️')">🏋️‍♀️</div>
+  <div class="childSubContainer sport" onclick="appendEmoji('🏀')">🏀</div>
+  <div class="childSubContainer sport" onclick="appendEmoji('🏈')">🏈</div>
+  <div class="childSubContainer sport" onclick="appendEmoji('⚽')">⚽</div>
+  <div class="childSubContainer sport" onclick="appendEmoji('🎾')">🎾</div>
+  <div class="childSubContainer sport" onclick="appendEmoji('🏓')">🏓</div>
+  <div class="childSubContainer sport" onclick="appendEmoji('🏸')">🏸</div>
+  <div class="childSubContainer sport" onclick="appendEmoji('🏊‍♂️')">🏊‍♂️</div>
+  <div class="childSubContainer sport" onclick="appendEmoji('🏊‍♀️')">🏊‍♀️</div>
+  </div>
+  
+  <div class="childContainer" id="cContainer">
+    <div class="childSubContainer" onclick="appendEmoji('💡')">💡</div>
+    <div class="childSubContainer" onclick="appendEmoji('🎉')">🎉</div>
+    <div class="childSubContainer" onclick="appendEmoji('🔥')">🔥</div>
+    <div class="childSubContainer" onclick="appendEmoji('💰')">💰</div>
+    <div class="childSubContainer" onclick="appendEmoji('🛍️')">🛍️</div>
+    <div class="childSubContainer" onclick="appendEmoji('🎈')">🎈</div>
+    <div class="childSubContainer" onclick="appendEmoji('⌛')">⌛</div>
+    <div class="childSubContainer" onclick="appendEmoji('🔔')">🔔</div>
+    <div class="childSubContainer" onclick="appendEmoji('📚')">📚</div>
+    <div class="childSubContainer" onclick="appendEmoji('🎵')">🎵</div>
+  </div>
+  
+  <div class="childContainer" id="cContainer">
+    <div class="childSubContainer food" onclick="appendEmoji('☀️')">☀️</div>
+    <div class="childSubContainer food" onclick="appendEmoji('🌤️')">🌤️</div>
+    <div class="childSubContainer food" onclick="appendEmoji('🌧️')">🌧️</div>
+    <div class="childSubContainer food" onclick="appendEmoji('❄️')">❄️</div>
+    <div class="childSubContainer food" onclick="appendEmoji('⛅')">⛅</div>
+    <div class="childSubContainer food" onclick="appendEmoji('🌩️')">🌩️</div>
+    <div class="childSubContainer food" onclick="appendEmoji('🌪️')">🌪️</div>
+    <div class="childSubContainer food" onclick="appendEmoji('🌈')">🌈</div>
+    <div class="childSubContainer food" onclick="appendEmoji('🌊')">🌊</div>
+    <div class="childSubContainer food" onclick="appendEmoji('🌫️')">🌫️</div>
+  </div>   
+    
+  </div>
+`;
+
+
+
+
+
+
+file.onchange = function(){
+  if(file.files[0].size < 1000000){  // 1MB = 1000000
+      var fileReader = new FileReader();
+
+      fileReader.onload = function(e){
+          imgUrl = e.target.result
+          imgInput.src = imgUrl
+      }
+
+      fileReader.readAsDataURL(file.files[0])
+  } else {
+      alert("This file is too large!")
+  }
+}
 
 
 
@@ -41,7 +155,7 @@ async function displayUserStatus() {
 
       resp.data.data.forEach(user => {
         const chatBox = createChatBoxElement(user);
-        attachEventListeners(chatBox, user.id, user.name, user.status, chatTypeOptions.User)
+        attachEventListeners(chatBox, user, chatTypeOptions.User)
         chatList.appendChild(chatBox);
       });
   
@@ -58,27 +172,28 @@ async function displayUserStatus() {
   
 function createChatBoxElement(user) {
     
-    const chatBox = document.createElement('div');
-    chatBox.classList.add('chat-box');
-    
-    chatBox.innerHTML = `
-      <div class="img-box">
-        <img class="img-cover" src="/images/profile/profile1.webp" alt="profileImg">
-        <div class="hidden-id" style="display: none;">${user.id}</div>     
-      </div>
-      <div class="chat-details">
-        <div class="text-head">
-          <h4>${user.name}</h4>
-        </div>
-        <div class="hidden-id" style="display: none;">${user.id}</div>     
-      </div>
-
-      <div class="user-status ${user.status === 'online' ? 'online' : 'offline'}">
+  const chatBox = document.createElement('div');
+  chatBox.classList.add('chat-box');
+  
+  chatBox.innerHTML = `
+    <div class="img-box">
+      <img class="img-cover" src="${user.imgpath}" alt="profileImg" width="50" height="50">
       <div class="hidden-id" style="display: none;">${user.id}</div>     
-      </div>     
-    `;
-    
-    return chatBox;
+    </div>
+
+    <div class="chat-details">
+      <div class="text-head">
+        <h4>${user.name}</h4>
+      </div>
+      <div class="hidden-id" style="display: none;">${user.id}</div>     
+    </div>
+
+    <div class="user-status ${user.status === 'online' ? 'online' : 'offline'}">
+      <div class="hidden-id" style="display: none;">${user.id}</div>     
+    </div>
+  `;
+  
+  return chatBox;
   
 }
   
@@ -86,26 +201,32 @@ function createChatBoxElement(user) {
   
   
   
-function attachEventListeners(chatBox, receiverId, userName, status, uType, isAdmin) {
+ function attachEventListeners(chatBox, user, uType, isAdmin) {
+  
+  if(uType === 'group') {
+    user.name = user.groupName,
+    user.imgpath = user.imgpath,
+    user.status = '';
+  }
 
   const imgBoxDiv = chatBox.querySelector('.img-box');
   imgBoxDiv.addEventListener('click', () => {
     console.log('Clicked on img-box');
-    showChatDetails(receiverId, userName, status, uType, isAdmin);
+    showChatDetails(user.id, user.name, user.imgpath, user.status, uType, isAdmin);
   });
 
 
   const chatDetailsDiv = chatBox.querySelector('.chat-details');
   chatDetailsDiv.addEventListener('click', () => {
     console.log('Clicked on chat-details');
-    showChatDetails(receiverId, userName, status, uType, isAdmin);
+    showChatDetails(user.id, user.name, user.imgpath, user.status, uType, isAdmin);
   });
 
 
   const userStatusDiv = chatBox.querySelector('.user-status');
   userStatusDiv.addEventListener('click', () => {
     console.log('Clicked on user-status');
-    showChatDetails(receiverId, userName, status, uType, isAdmin);
+    showChatDetails(user.id, user.name, user.imgpath, user.status, uType, isAdmin);
   });
     
 }
@@ -113,26 +234,25 @@ function attachEventListeners(chatBox, receiverId, userName, status, uType, isAd
   
   
   
-async function showChatDetails(receiverId, userName, status, uType, isAdmin) {
- 
-    const rightContainer = document.querySelector('.right-container');
-    rightContainer.innerHTML = '';
-  
-    const header = createHeader(userName, status, isAdmin);
-    if(isAdmin) {
-      editGroupListener(header, receiverId, userName);
-    }
-    rightContainer.appendChild(header);
-   
-    const chatContainer = createChatContainer();
-    const resp = await fetchMessages(receiverId, uType);
+async function showChatDetails(receiverId, userName, profilePic, status, uType, isAdmin) {
+    
+  const rightContainer = document.querySelector('.right-container');
+  rightContainer.innerHTML = '';
 
-    populateMessages(chatContainer, resp);
-    rightContainer.appendChild(chatContainer);
+  const header = createHeader(userName, status, profilePic, isAdmin);
+  if(isAdmin) {
+    editGroupListener(header, receiverId, userName);
+  }
+  rightContainer.appendChild(header);
   
-    const chatboxinput = createChatInput();
-    attachSendMessageEvent(chatboxinput, receiverId, userName, uType);
-    rightContainer.appendChild(chatboxinput);
+  const chatContainer = createChatContainer();
+  const resp = await fetchMessages(receiverId, uType);
+  populateMessages(chatContainer, resp);
+  rightContainer.appendChild(chatContainer);
+
+  const chatboxinput = createChatInput();
+  attachSendMessageEvent(chatboxinput, receiverId, userName, uType);
+  rightContainer.appendChild(chatboxinput);
   
 }
 
@@ -163,7 +283,7 @@ async function fetchMessages(receiverId, uType) {
   
   
   
-function createHeader(userName, status, isAdmin) {
+function createHeader(userName, status, profilePic, isAdmin) {
  
   const header = document.createElement('div');
   header.classList.add('header');
@@ -176,9 +296,9 @@ function createHeader(userName, status, isAdmin) {
   header.innerHTML = `
     <div class="img-text">
       <div class="user-img">
-        <img class="dp" src="https://images.pexels.com/photos/2474307/pexels-photo-2474307.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" alt="">
+        <img class="dp" src="${profilePic}" alt="" width="50" height="50">
       </div>
-      <h4>${userName}<br><span>${status}</span></h4>
+      <h5 class="user-name">${userName}<br><span>${status}</span></h5>
     </div>
     <div class="nav-icons">
       ${editIconHTML}
@@ -197,10 +317,10 @@ function createHeader(userName, status, isAdmin) {
   
 function createChatContainer() {
   
-    const chatContainer = document.createElement('div');
-    chatContainer.classList.add('chatContainer');
-    
-    return chatContainer;
+  const chatContainer = document.createElement('div');
+  chatContainer.classList.add('chatContainer');
+  
+  return chatContainer;
   
 }
   
@@ -236,10 +356,6 @@ function createMessageBox(message, currentId) {
   <p><strong>${message.senderName}</strong><br>
   <span>${message.message}</span></p>
 `;
-
-  // messageBox.innerHTML = `
-  //     <p>${message.message}<br><span>${message.currentUser}</span><span>${message.createdAt}</span></p>
-  // `;
   
   return messageBox;
   
@@ -255,22 +371,51 @@ function createChatInput() {
   chatboxinput.classList.add('chatbox-input');
   
   chatboxinput.innerHTML = `
-    <i class="fa-regular fa-face-grin"></i>
+    <i class="fa-regular fa-face-grin" id="emojiInitiator" onclick="toggleEmoji()"></i>
+    ${emoList}
     <i class="fa-sharp fa-solid fa-paperclip"></i>
     <input type="text" placeholder="Type a message">
     <i class="fa fa-send-o"></i>
   `;
-  
+
   return chatboxinput;
   
 }
+
+
+
+
+
+function toggleEmoji() {
   
+  let emojiIcon = document.getElementById('emojiInitiator');
   
+  emojiIcon.addEventListener('click', ()=> {
+    let pContainer = document.getElementById('pContainer');
+    pContainer.style.display = (pContainer.style.display === 'flex') ? 'none' : 'flex';
+  });
+
+}
+
   
+
+
+function appendEmoji(emoji) {
+
+  const inputField = document.querySelector('.chatbox-input input[type="text"]');
   
+  if (inputField) {
+    inputField.value += emoji;
+  }
   
+}
+
+
+
+
+
 function attachSendMessageEvent(chatboxinput, receiverId, userName, uType) {
-    
+
   const sendButton = chatboxinput.querySelector('.fa-send-o');
   
   sendButton.addEventListener('click', () => {
@@ -280,6 +425,7 @@ function attachSendMessageEvent(chatboxinput, receiverId, userName, uType) {
     if (message) {
       inputField.value = '';
       sendMessage(userName, receiverId, message, uType);
+     
     } else {
       console.log('Please type a message before sending.');
     }
@@ -293,7 +439,7 @@ function attachSendMessageEvent(chatboxinput, receiverId, userName, uType) {
 
   
 async function sendMessage(uName, recId, msg, uType) {
-  
+
   try {
 
     console.log('User : ', uName);
@@ -312,7 +458,7 @@ async function sendMessage(uName, recId, msg, uType) {
     console.log(`URL : ${apiURL}`);
 
     const response = await axios.post(apiURL, uObj, getHeaders());
-    console.log('Message sent successfully:', +response.data.chatMessage);
+    console.log('Message sent successfully:', response.data.chatMessage);
 
     lastMessageId = response.data.chatMessage.id;
     fetchNewMessages(lastMessageId);
@@ -323,19 +469,19 @@ async function sendMessage(uName, recId, msg, uType) {
     throw new Error(err);
   }
 
-} 
+}
   
   
 
 
 
-async function fetchNewMessages(recentMsgId) {
+ async function fetchNewMessages (recentMsgId) {
   
   try {
     
     const chatContainer = document.querySelector('.chatContainer');
     const response = await recentMessage(recentMsgId);
-
+   
     if (response.data.length > 0) {
       lastMessageId = response.data[response.data.length - 1].id;
     } else {
@@ -348,7 +494,7 @@ async function fetchNewMessages(recentMsgId) {
       console.error("Error fetching and updating messages:", err);
   }
 
-}
+};
 
 
 
@@ -377,9 +523,22 @@ async function recentMessage(recMsgId = null) {
 
 
 
+
 document.addEventListener("DOMContentLoaded", async function() {
 
   const response = await displayUserStatus();
-  createChatBoxes(response);
-
+  if(response.data.data.length > 0) {
+    createChatBoxes(response);
+  }
+  
 });
+
+
+
+
+// form.addEventListener('submit', async(e) => {
+//   e.preventDefault();
+  
+//   await uploadProfilePicture(imgInput.src);
+
+// });

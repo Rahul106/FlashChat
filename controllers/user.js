@@ -8,12 +8,47 @@ const { isNotValidInput } = require('../utils/validation');
 
 
 
+
+exports.uploadProfilePicture= async(req, res, next) => {
+
+  console.log('Current-User-Id : ', req.user.id);
+
+  const imgLocation = req.body.profilePicture; 
+  console.log('Profile-Picture : ' +imgLocation);
+
+  try {
+
+    const [updatedCount, updatedUser] = await User.update(
+      { imgpath: imgLocation },
+      { 
+        where: { id: req.user.id },
+        returning: true
+      }
+    );
+
+    if (updatedUser > 0) {
+      const updatedUser = await User.findOne({ where: { id: req.user.id } });
+      res.status(200).json({ message: "Profile picture updated successfully", user: updatedUser });
+    } else {
+      res.status(400).json({ message: "Failed to update profile picture" });
+    }
+
+  } catch (error) {
+    console.error('Error uploading profile picture:', error);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+
+}
+
+
+
+
 exports.getAllUsersWithStatus= async(req, res, next) => {
   
   try {
     
     const users = await User.findAll({
-      attributes: ['id', 'name', 'status'],
+      attributes: ['id', 'name', 'imgpath', 'status'],
       where: {
         id: {
           [Sequelize.Op.not]: req.user.id
@@ -24,6 +59,7 @@ exports.getAllUsersWithStatus= async(req, res, next) => {
     const userNameAndStatus = users.map(user => ({
       id: user.id,
       name: user.name,
+      imgpath: user.imgpath,
       status: user.status
     }));
 
@@ -52,7 +88,7 @@ exports.getCurrentUserInfo = async(req, res, next) => {
     console.log('User-Id : ' +req.user.id);
 
     const userDetails = await User.findOne({
-      attributes: ['id', 'name', 'email', 'phone'],
+      attributes: ['id', 'name', 'email', 'phone', 'imgpath'],
       where: {
         id: req.user.id
       }
@@ -60,7 +96,7 @@ exports.getCurrentUserInfo = async(req, res, next) => {
 
     if (userDetails) {
 
-      console.log('------User Found Successfull-------');
+      console.log('------User Found Successfull-------' +userDetails);
 
       return res
       .status(200)
@@ -71,7 +107,8 @@ exports.getCurrentUserInfo = async(req, res, next) => {
           userId : userDetails.id,
           name: userDetails.name,
           email: userDetails.email,
-          phone: userDetails.phone
+          phone: userDetails.phone,
+          imgpath: userDetails.imgpath
         },
       });
 
@@ -152,6 +189,26 @@ exports.authenticateUser = async(req, res, next) => {
   }
   
 };
+
+
+
+
+
+
+exports.logoutUser = async(req, res) => {
+
+  try {
+    await User.update({ status: 'offline' }, { where: { id: req.user.id } });
+    return res.status(200).json({ message: 'User logged out successfully', success: true });
+  } catch (err) {
+    console.error(err);
+    return res.status(401).json({ message: 'User logged out successfully - Technical Error.', success: false });
+  }
+  
+    
+}
+
+
 
 
 

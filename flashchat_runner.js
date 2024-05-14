@@ -7,14 +7,6 @@ const sequelize = require("./utils/database");
 
 
 
-
-//middleware for user authentication
-const userAuthentication = require('./middlewares/auth');
-
-
-
-
-
 //models
 const User = require("./models/User");
 const Chat = require('./models/Chat');
@@ -23,6 +15,16 @@ const Groupmember = require('./models/Groupmember');
 
 
 
+//importing routes
+const userRoute = require("./routes/user");
+const chatRoute = require('./routes/chat'); 
+const groupRoute = require('./routes/group'); 
+const messages = require('./routes/socket_Io')
+
+
+
+//middleware for user authentication
+const userAuthentication = require('./middlewares/auth');
 
 
 
@@ -32,26 +34,10 @@ const faviconPath = path.join(publicPath, "images", "Ico", "flashchat.ico");
 
 
 
-app.use(express.static(publicPath));
-
-
-
 
 //middlewares
-require('dotenv').config();
+app.use(express.static(publicPath));
 app.use(express.json());
-
-
-
-
-
-//importing routes
-const userRoute = require("./routes/user");
-const chatRoute = require('./routes/chat'); 
-const groupRoute = require('./routes/group'); 
-
-
-
 
 
 
@@ -84,6 +70,9 @@ app.get('/chat', (req, res) => {
   res.sendFile('/views/chat.html', { root: publicPath });
 });
 
+app.get('/logout', (req, res) => {
+  res.sendFile('/views/portal.html', { root: publicPath });
+});
 
 
 
@@ -98,6 +87,7 @@ app.use('/group', groupRoute);
 
 
 
+//DB Associations
 User.hasMany(Chat);
 Chat.belongsTo(User, { foreignKey: 'senderId', as: 'sender' });
 Chat.belongsTo(User, { foreignKey: 'receiverId', as: 'receiver' });
@@ -105,17 +95,13 @@ Chat.belongsTo(User, { foreignKey: 'receiverId', as: 'receiver' });
 Group.belongsToMany(User, {through: Groupmember});
 User.belongsToMany(Group, {through: Groupmember});
 
-// Group.belongsToMany(User, { through: Groupmember, as: 'admins' });
-// User.belongsToMany(Group, { through: Groupmember, as: 'adminOf' });
 
 
 
 const PORT = process.env.PORT_NO;
 
 function startServer() {
-
   sequelize
-    //.sync({ force: true })
     .sync()
     .then(() => {
       console.log("Models synced with database");
@@ -124,11 +110,9 @@ function startServer() {
       app.listen(PORT, () => {
         console.log(`Server is running on port ${PORT}`);
       });
-    })
-    .catch((err) => {
+    }).catch((err) => {
       console.error("Error syncing models with database:", err);
     });
-
 }
 
 startServer();
