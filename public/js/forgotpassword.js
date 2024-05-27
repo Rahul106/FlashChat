@@ -1,5 +1,3 @@
-
-
 let resetBtn = document.getElementById('resetBtn');
 
 

@@ -507,8 +507,8 @@ body {
 }
 
 .childSubContainer{
-  height: 36px;
-  width: 36px;
+  height: 33px;
+  width: 33px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -603,7 +603,7 @@ body {
 
 
 .modal-content {
-  max-width: 300px; /* Adjust the width as needed */
+  max-width: 300px;
   margin: auto;
 }
 
@@ -612,8 +612,95 @@ body {
 }
 
 .modal-body {
-  max-height: calc(100vh - 200px); /* Adjust the max-height as needed */
+  max-height: calc(100vh - 200px); 
   overflow-y: auto;
   
 }
 
+
+
+.preview-container {
+  display: none; 
+  position: fixed; 
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%); 
+  background-color: rgba(0, 0, 0, 0.8); 
+  padding: 10px; 
+  border-radius: 10px; 
+}
+
+
+
+#selectedFilePreview {
+  max-width: 200px;
+  max-height: 200px;
+  display: block;
+}
+
+.cancelButtonContainer {
+  display: flex;
+  justify-content: center; /* Center the cancel button horizontally */
+  align-items: center; /* Center the cancel button vertically */
+  flex: 1; /* Let the cancel button container take up all available space */
+}
+
+
+
+ .gif-container {
+  position: absolute;
+  bottom: 100px;
+  left: 400px;
+  width: 300px;
+  height: 200px;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  display: none;
+  flex-direction: column;
+  overflow-y: scroll;
+}
+
+.gif-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 10px;
+}
+
+.gif-item {
+  width: 100px;
+  height: auto;
+  cursor: pointer;
+  border-radius: 5px;
+} 
+
+
+/* .gif-container {
+  position: absolute;
+  bottom: 100px;
+  left: 400px;
+  width: 300px;
+  height: 200px;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  display: none;
+  flex-direction: column;
+  overflow-y: scroll;
+}
+
+.gif-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 3 columns layout */
+ 
+  /* gap: 10px;
+  padding: 10px;
+}
+
+.gif-item {
+  width: 100%;
+  height: auto;
+  cursor: pointer;
+  border-radius: 5px;
+} */ 

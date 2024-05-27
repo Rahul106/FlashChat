@@ -1,4 +1,3 @@
-// models/ChatMessage.js
 const { DataTypes } = require('sequelize');
 const sequelize = require('../utils/database');
 
@@ -31,6 +30,12 @@ const Chat = sequelize.define('Chat', {
   message: {
     type: DataTypes.TEXT,
     allowNull: false
+  },
+
+  fileUrl: {
+    type: DataTypes.TEXT,
+    allowNull: true,
+    defaultValue: 'no-image'
   }
   
 });

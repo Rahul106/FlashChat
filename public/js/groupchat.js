@@ -1,10 +1,7 @@
 const groupUsersIcon = document.getElementById('groupUsersIcon');
 const createGroup = document.getElementById('createGroup');
 let picInput = document.querySelector(".img");
-//let file = document.getElementById("imgInput");
 let editId = 0;
-
-
 
 
 const msgTypeOptions = {
@@ -13,24 +10,28 @@ const msgTypeOptions = {
 };
 
 
-file.onchange = function(){
-  if(file.files[0].size < 1000000){  // 1MB = 1000000
-      var fileReader = new FileReader();
 
-      fileReader.onload = function(e){
-          imgUrl = e.target.result
-          picInput.src = imgUrl
-      }
 
-      fileReader.readAsDataURL(file.files[0])
-  }
-  else{
+//todo - handle file input change
+file.onchange = function() {
+
+  if(file.files[0].size < 1000000) {  // 1MB = 1000000
+    var fileReader = new FileReader();
+    fileReader.onload = function(e){
+        imgUrl = e.target.result
+        picInput.src = imgUrl
+    }
+    fileReader.readAsDataURL(file.files[0])
+  } else {
       alert("This file is too large!")
   }
+
 }
 
 
 
+
+//todo - fetch group members
 async function fetchGroupMembers(groupId) {
   
   let apiURL = `${getAPIURL()}/group/get-groupmembers/${groupId}`;
@@ -49,13 +50,16 @@ async function fetchGroupMembers(groupId) {
 
 
 
-
- const editGroupListener = async (header, grpId, grpName) => {
+//todo - activate group edit form.
+const editGroupListener = async (header, grpId, grpName) => {
 
   const editButton = header.querySelector('.fa-edit');
  
   editButton.addEventListener('click', async function() {
 
+    //imgInput.src = '/images/Profile Icon.webp'
+    picInput.src = await fetchCurrentGroupProfilePic(grpId);
+    
     const response = await fetchAllUsers();
 
     const groupMembersResponse = await fetchGroupMembers(grpId);
@@ -95,6 +99,7 @@ async function fetchGroupMembers(groupId) {
 
 
 
+//todo - initialize group creation/editing.
 function initiateGroup(isEdit) {
 
   const groupName = document.getElementById('groupName').value;
@@ -125,7 +130,7 @@ function initiateGroup(isEdit) {
   
 
 
-  
+//todo - create group.
 async function formGroup(gName, gImage, sUsers, isEdit) {
   
   console.log('Group Name:', gName);
@@ -150,9 +155,11 @@ async function formGroup(gName, gImage, sUsers, isEdit) {
     console.log('<---Group-Id-----> : ', response.data.group.id);
     console.log('<---Group-User---> : ', response.data.group.adminId);
 
-    const resp = await displayUserStatus();
-    createChatBoxes(resp);
+    //const resp = await displayUserStatus();
+    //createChatBoxes(resp);
+    socket.emit('userActivity');
     fetchCurrentUserGroups();
+   
 
     $('#exampleModalCenter').on('hidden.bs.modal', function () {
       const formInputs = document.querySelectorAll('#exampleModalCenter input');
@@ -173,6 +180,7 @@ async function formGroup(gName, gImage, sUsers, isEdit) {
 
 
 
+// todo - display group list on side-screen.
 function renderGroups(chatList, groupsArr, userId) {
   
   groupsArr.forEach(group => {
@@ -188,76 +196,67 @@ function renderGroups(chatList, groupsArr, userId) {
   
   
   
+
+
+//todo - display each group on main-screen
+function renderGroupOnScreen(groupName, groupId, groupDp, isAdmin) {
+ 
+  const newGroup = document.createElement('div');
+  newGroup.classList.add('chat-box');
+
+  newGroup.id = `group${groupId}`
+  newGroup.textContent = groupName;
   
-  
-  function renderGroupOnScreen(groupName, groupId, groupDp, isAdmin) {
-   
-    const newGroup = document.createElement('div');
-    newGroup.classList.add('chat-box');
-  
-    newGroup.id = `group${groupId}`
-    newGroup.textContent = groupName;
-  
-    newGroup.innerHTML = `
-        <div class="img-box">
-          <img class="img-cover" src="${groupDp}" alt="profileImg" width="50" height="50">
-          <div class="hidden-id" style="display: none;">${newGroup.id}</div>     
-        </div>
-        <div class="chat-details">
-          <div class="text-head">
-            <h4>${newGroup.textContent}</h4>
-          </div>
-          <div class="hidden-id" style="display: none;">${newGroup.id}</div>     
-        </div>
-        <div class="user-status">
+  newGroup.innerHTML = `
+      <div class="img-box">
+        <img class="img-cover" src="${groupDp}" alt="profileImg" width="50" height="50">
         <div class="hidden-id" style="display: none;">${newGroup.id}</div>     
-        </div>       
-      `;
-      
-      // if (isAdmin) {
-    //     createEditButton(groupId);
-    // }
-    
-     // newGroup.addEventListener('click', () => {
-    //     newGroupHandler(groupId);
-    // });
+      </div>
+      <div class="chat-details">
+        <div class="text-head">
+          <h4>${newGroup.textContent}</h4>
+        </div>
+        <div class="hidden-id" style="display: none;">${newGroup.id}</div>     
+      </div>
+      <div class="user-status">
+      <div class="hidden-id" style="display: none;">${newGroup.id}</div>     
+      </div>       
+    `;
   
-  
-    return newGroup;
-   
-  }
+  return newGroup;
+}
 
 
 
 
 
-
+// todo - fetch current user's groups
 async function fetchCurrentUserGroups() {
   
-    const chatList = document.querySelector('.chat-list');  
-    //chatList.innerHTML = '';
+  const chatList = document.querySelector('.chat-list');  
+  //chatList.innerHTML = '';
+
+  try {
   
-    try {
+    let apiURL = `${getAPIURL()}/group/get-mygroups`;
+    console.log('URL : ', apiURL);
     
-      let apiURL = `${getAPIURL()}/group/get-mygroups`;
-      console.log('URL : ', apiURL);
-      
-      const response = await Promise.all([
-        fetchCurrentUser(), 
-        axios.get(apiURL, getHeaders())
-      ]);
-      console.log('======', response);
-      console.log('User-Details : ', response[0].data.data.userId);
-      console.log('Groups-Details : ', response[1].data.groups);
+    const response = await Promise.all([
+      fetchCurrentUser(), 
+      axios.get(apiURL, getHeaders())
+    ]);
   
-      const userId = response[0].data.data.userId;
-      const groupsArr = response[1].data.groups;
-  
-      renderGroups(chatList, groupsArr, userId);
-      
-    } catch (err) {
-        alert(err.message);
-    }
+    console.log('User-Details : ', response[0].data.data.userId);
+    console.log('Groups-Details : ', response[1].data.groups);
+
+    const userId = response[0].data.data.userId;
+    const groupsArr = response[1].data.groups;
+
+    renderGroups(chatList, groupsArr, userId);
+    
+  } catch (err) {
+      alert(err.message);
+  }
 
 }
   
@@ -265,6 +264,7 @@ async function fetchCurrentUserGroups() {
 
 
 
+//todo - fetch all user status
 async function fetchAllUsers() {
   
   let apiURL = `${getAPIURL()}/user/users-status`;
@@ -284,8 +284,7 @@ async function fetchAllUsers() {
 
 
 
-
-
+//todo - populate user selection checkboxes.
 function populateUserSelection(resp, groupMembers = []) {
   
   const userSelectionDiv = document.querySelector('.user-selection');
@@ -343,6 +342,37 @@ function populateUserSelection(resp, groupMembers = []) {
 
 
 
+// todo - fetch group profile picture
+async function fetchCurrentGroupProfilePic(grpId) {
+
+  try {
+      
+    let apiURL = `${getAPIURL()}/group/get-mygroups/${grpId}`;
+    console.log('URL:', apiURL);
+
+    const response = await axios.get(apiURL, getHeaders());
+    if (response.data.success) {
+        console.log('Group Image Path:', response.data.imgpath);
+        return response.data.imgpath;
+    } else {
+        console.error('Error:', response.data.message);
+        alert(response.data.message);
+        return null;
+    }
+
+  } catch (err) {
+    console.error('Error fetching group profile pic:', err.message);
+    alert('An error occurred while fetching the group profile picture.');
+    return null;
+  }
+  
+}
+
+
+
+
+
+//todo - handle create group button click.
 createGroup.addEventListener("click", function() {
 
   const createGroupButton = document.getElementById('createGroup');
@@ -368,22 +398,13 @@ createGroup.addEventListener("click", function() {
 
 
 
+//todo - page loads create user selection.
 groupUsersIcon.addEventListener('click', async function() {
 
+  imgInput.src = '/images/Profile Icon.webp'  
   const response = await fetchAllUsers();
   populateUserSelection(response);
   
 });
-
-
-
-
-
-document.addEventListener("DOMContentLoaded", async function() {
-  
-  fetchCurrentUserGroups();
-  
-});
-
 
 

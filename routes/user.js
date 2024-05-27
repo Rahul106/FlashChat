@@ -11,14 +11,11 @@ router.post('/login', userController.authenticateUser);
 
 router.post('/upload-dp',  userAuthentication.isAuthenticated, userController.uploadProfilePicture);
 
-console.log('---------------------');
 router.get('/current-user',  userAuthentication.isAuthenticated, userController.getCurrentUserInfo);
 
 router.get('/users-status',  userAuthentication.isAuthenticated, userController.getAllUsersWithStatus);
 
 router.get('/logout',  userAuthentication.isAuthenticated, userController.logoutUser);
-
-
 
 
 module.exports = router;

@@ -11,5 +11,4 @@ router.get('/fetch-messages/:receiverId', chatController.fetchMessages);
 router.get('/recent-message/:recMsgId', chatController.recentMessage);
 
 
-
 module.exports = router;

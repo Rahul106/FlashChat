@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User'); 
 
 
-const isAuthenticated = (req, res, next)=> {
+const isAuthenticated = (req, res, next) => {
     
     try {
         
@@ -20,9 +20,8 @@ const isAuthenticated = (req, res, next)=> {
         const user = jwt.verify(token, process.env.JWT_SECRET_KEY);
         console.log(`User : ${user}`);
 
-        User
-        .findByPk(user.id)
-        .then((user)=> {
+        User.findByPk(user.id)
+        .then((user) => {
             
             if(user){
                 req.user = user;

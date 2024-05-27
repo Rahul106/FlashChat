@@ -8,7 +8,7 @@ const { isNotValidInput } = require('../utils/validation');
 
 
 
-
+// ? - insert profile picture url in table
 exports.uploadProfilePicture= async(req, res, next) => {
 
   console.log('Current-User-Id : ', req.user.id);
@@ -43,6 +43,8 @@ exports.uploadProfilePicture= async(req, res, next) => {
 
 
 
+
+// ? - fetch all user status/info
 exports.getAllUsersWithStatus= async(req, res, next) => {
   
   try {
@@ -78,7 +80,7 @@ exports.getAllUsersWithStatus= async(req, res, next) => {
 
 
 
-//* - function to fetch current user information
+// ? - function to fetch current user information
 exports.getCurrentUserInfo = async(req, res, next) => {
 
   console.log('-----Request-User-Info------');
@@ -143,7 +145,7 @@ exports.getCurrentUserInfo = async(req, res, next) => {
 
 
 
-//* - function to handles user authentication
+// ? - function to handles user authentication
 exports.authenticateUser = async(req, res, next) => {
 
   const { email, password } = req.body;
@@ -193,18 +195,18 @@ exports.authenticateUser = async(req, res, next) => {
 
 
 
-
-
+// ? - logout user
 exports.logoutUser = async(req, res) => {
 
   try {
+    
     await User.update({ status: 'offline' }, { where: { id: req.user.id } });
     return res.status(200).json({ message: 'User logged out successfully', success: true });
+  
   } catch (err) {
     console.error(err);
     return res.status(401).json({ message: 'User logged out successfully - Technical Error.', success: false });
   }
-  
     
 }
 
@@ -213,7 +215,7 @@ exports.logoutUser = async(req, res) => {
 
 
 
-//* - function to creates a new user
+// ? - function to creates a new user
 exports.createNewUser = async(req, res) => {
     
   try {
@@ -265,7 +267,7 @@ exports.createNewUser = async(req, res) => {
 
 
 
-//* - methods generates JWT with id and name
+// ? - methods generates JWT with id and name
 const generateAccessToken = (id, name) => {
 
   return jwt.sign({id:id, name:name}, process.env.JWT_SECRET_KEY);

@@ -1,12 +1,11 @@
 const { Op } = require('sequelize');
 const Chat = require('../models/Chat');
 const User = require('../models/User');
-//const Group = require('../models/Group');
 
 
 
 
-
+//? - fetches recent chat message details
 exports.recentMessage = async(req, res) => {
  
   const { recMsgId } = req.params;
@@ -39,10 +38,11 @@ exports.recentMessage = async(req, res) => {
       currentUser: req.user.name,
       receiverId: chatMessage.receiverId,
       receiverName: chatMessage.receiver.name,
+      fileUrl: chatMessage.fileUrl,
       createdAt: chatMessage.createdAt
     };
     
-    return res.json(formattedMessage);
+    return res.status(200).json({ message: 'Recent chat message fetched successfully', recentMessage: formattedMessage });
 
   } catch(error) {
      
@@ -55,9 +55,7 @@ exports.recentMessage = async(req, res) => {
 
 
 
-
-
-//* - function to creates a new user
+//? - sends a new chat message
 exports.sendMessage = async(req, res) => {
    
   const { recId } =  req.params;
@@ -66,7 +64,7 @@ exports.sendMessage = async(req, res) => {
   const senderId = req.user.id;
   console.log('Sender-Id  : ' +senderId);
 
-  const { userType, message } = req.body;
+  const { userType, message, imageUrl} = req.body;
   console.log('Message : ', message);
 
   try {
@@ -75,11 +73,12 @@ exports.sendMessage = async(req, res) => {
       senderId : senderId,
       receiverId : recId,
       message : message,
+      fileUrl : imageUrl,
       userType: userType,
       userId : req.user.id
     });
     
-    return res.status(201).json({ message: 'Chat message saved successfully', chatMessage: newChatMessage });
+    return res.status(201).json({ message: 'Chat message saved successfully', messages: newChatMessage });
 
   } catch(error) {
      
@@ -92,7 +91,7 @@ exports.sendMessage = async(req, res) => {
 
 
 
-
+//? - retrieves chat messages
 exports.fetchMessages = async(req, res) => {
 
   const { receiverId } =  req.params;
@@ -144,6 +143,7 @@ exports.fetchMessages = async(req, res) => {
       return {
         id: message.id,
         message: message.message,
+        fileUrl: message.fileUrl,
         senderId: message.senderId,
         senderName: message.sender.name,
         currentId: req.user.id,
@@ -154,7 +154,7 @@ exports.fetchMessages = async(req, res) => {
       };
     });
 
-  return res.json(formattedMessages);
+    return res.status(200).json({ message: 'Chat messages fetched successfully', messages: formattedMessages });
 
   } catch(error) {
     

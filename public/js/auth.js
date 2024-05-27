@@ -1,4 +1,3 @@
-
 let signIn = document.getElementById("i_signInForm");
 let signUp = document.getElementById('si_userForm');
 
@@ -37,7 +36,7 @@ async function userLogin(e) {
       window.location.href = "/dashboard";
       e.target.n_email.value = '';
       e.target.n_password.value = '';
-    
+
     } else {
       throw new Error("Error in credentials");
     }
@@ -49,7 +48,6 @@ async function userLogin(e) {
   }
 
 }
-
 
 
 
@@ -90,7 +88,7 @@ async function addNewUser(uObj) {
 
 
 
-//TODO - user-registration process
+//todo - user-registration process
 function userRegistration(e) {
 
   const name = e.target.sn_name.value;
@@ -129,6 +127,8 @@ function userRegistration(e) {
   
 
 
+
+//todo - show error alert 
 function alertAwakeSleep() {
   document.querySelector("#errorAlert").classList.toggle("hidden");
   setTimeout(function () {
@@ -139,6 +139,7 @@ function alertAwakeSleep() {
 
 
 
+//todo - show success alert
 function successAlertAwakeSleep() {
   document.querySelector("#successAlert").classList.toggle("hidden");
   setTimeout(function () {
@@ -149,17 +150,16 @@ function successAlertAwakeSleep() {
 
 
 
-//todo - add eventlistener on signin butoon for form submission
+//todo - add eventlistener on signin button for form submission
 signIn.addEventListener('submit', function(event) {
   event.preventDefault();
-  
   userLogin(event);
 });
 
 
 
 
-//todo - add eventlistener on signup butoon for form submission
+//todo - add eventlistener on signup button for form submission
 signUp.addEventListener('submit', function(event) {
   event.preventDefault();
   userRegistration(event);

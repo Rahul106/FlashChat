@@ -1,10 +1,41 @@
 const Group = require('../models/Group');
 const Groupmember = require('../models/Groupmember');
-const User = require('../models/User');
-//const Groupmember = require("../models/Groupmember");
 
 
 
+
+
+// ? - retrieve group image path
+exports.getCurrentGroupDp = async (req, res) => {
+    
+    const groupId = req.params.grpId;
+    console.log('GroupId:', groupId);
+
+    try {
+        
+        const group = await Group.findOne({
+            where: { id: groupId },
+            attributes: ['imgpath'],
+        });
+
+        if (!group) {
+            return res.status(404).json({ success: false, message: 'Group not found' });
+        }
+
+        return res.status(200).json({ success: true, message: 'Group image path fetched successfully', imgpath: group.imgpath });
+    
+    } catch (error) {
+        console.error('Error fetching group imgpath:', error.message);
+        return res.status(500).json({ success: false, message: 'Error fetching group image path', error: error.message });
+    }
+
+};
+
+
+
+
+
+// ? - edits group details and updates group membership.
 exports.editGroup = async (req, res) => {
 
     try {
@@ -62,6 +93,7 @@ exports.editGroup = async (req, res) => {
         const removedMembers = existingMemberIds.filter(id => !selectedUserIds.includes(id));
         const newMembers = selectedUserIds.filter(id => !existingMemberIds.includes(id));
 
+        // ? - execution are performed concurrently
         await Promise.all([
             existingGroup.removeUsers(removedMembers),
             existingGroup.addUsers(newMembers)
@@ -82,21 +114,27 @@ exports.editGroup = async (req, res) => {
 
 
 
+// ? - updates admin status for specified user Ids
 const updateIsAdminForAdminIds = async (adminUserIds, groupId) => {
+    
     try {
+
         await Promise.all(adminUserIds.map(async adminId => {
             await Groupmember.update({ isAdmin: true }, { where: { userId: adminId, groupId: groupId } });
         }));
+
     } catch (error) {
         console.error('Error updating isAdmin for adminIds:', error);
         throw error;
     }
+
 };
 
 
 
 
 
+// ? - fetches and returns members of a particular/specific group
 exports.getCurrentGroupMembers = async (req, res) => {
     
     //console.log(Object.keys(Group.prototype));
@@ -127,13 +165,12 @@ exports.getCurrentGroupMembers = async (req, res) => {
 
 
 
+
+// ? - fetches and returns the current user's groups
 exports.getCurrentUserGroups = async (req, res) => {
 
     try {
         
-        //console.log(Object.keys(Group.prototype));
-        //console.log(Object.keys(User.prototype));
-    
         const groups = await req.user.getGroups();
         
         if (groups) {
@@ -152,7 +189,7 @@ exports.getCurrentUserGroups = async (req, res) => {
 
 
 
-
+// ? -  creates a group and assigns users and admins
 exports.createGroup = async (req, res) => {
 
     try {
@@ -206,7 +243,7 @@ exports.createGroup = async (req, res) => {
         });
 
         for (const userId of userIds) {
-            const groupMember = await Groupmember .create({
+            const groupMember = await Groupmember.create({
                 userId: userId,
                 groupId: group.id,
                 isAdmin: adminIds.includes(userId),
@@ -219,4 +256,4 @@ exports.createGroup = async (req, res) => {
         res.status(500).json({ message: err.message });
     }
 
-}
+} 
